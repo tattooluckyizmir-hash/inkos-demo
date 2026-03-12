@@ -1,0 +1,1882 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>INKOS — Tattoo Studio Platform</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#06060a;--s1:#0d0d12;--s2:#141419;--s3:#1b1b22;--s4:#22222b;--s5:#2a2a35;
+  --border:rgba(255,255,255,0.055);--border2:rgba(255,255,255,0.11);--border3:rgba(255,255,255,0.18);
+  --ink:#d62839;--ink2:#a51d2c;--gold:#e8a045;--emerald:#3ecf8e;--sapphire:#4b9fff;--violet:#9b5de5;
+  --text:#e2e2ec;--muted:#52525e;--muted2:#7878a0;--cream:#f2ede3;--warm:#c8b89a;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;overflow-x:hidden}
+button{font-family:'DM Sans',sans-serif;cursor:pointer;border:none;background:none}
+input,textarea,select{font-family:'DM Sans',sans-serif;color:var(--text)}
+a{color:inherit;text-decoration:none}
+::selection{background:var(--ink);color:white}
+body::after{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");opacity:.022;pointer-events:none;z-index:9997}
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--s5);border-radius:2px}
+
+/* ═══ SCREENS ═══ */
+.screen{display:none;min-height:100vh}
+.screen.show{display:block}
+
+/* ═══ PUBLIC BAR ═══ */
+.pub-bar{background:var(--s1);border-bottom:1px solid var(--border);height:50px;display:flex;align-items:center;padding:0 14px;gap:8px;position:sticky;top:0;z-index:300}
+.pub-logo{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:.1em;color:var(--cream);display:flex;align-items:center;gap:8px;flex:1}
+.pub-logo-mark{width:28px;height:28px;border-radius:7px;background:var(--ink);display:flex;align-items:center;justify-content:center;font-size:13px}
+.pub-bar-btn{width:34px;height:34px;border-radius:9px;background:var(--s3);display:flex;align-items:center;justify-content:center;font-size:15px;cursor:pointer;transition:.15s;flex-shrink:0}
+.pub-bar-btn:hover{background:var(--s4)}
+.pill{padding:6px 14px;border-radius:100px;font-size:12px;font-weight:700;cursor:pointer;transition:.2s;flex-shrink:0}
+.pill-red{background:var(--ink);color:white}.pill-red:hover{background:var(--ink2)}
+.pill-ghost{background:var(--s3);color:var(--muted2);border:1px solid var(--border2)}.pill-ghost:hover{color:var(--text)}
+
+/* ═══ PROFILE ═══ */
+.pub-profile{padding:16px 14px 0}
+.prof-row{display:flex;align-items:flex-start;gap:18px;margin-bottom:14px}
+.prof-avatar{width:78px;height:78px;border-radius:50%;position:relative;flex-shrink:0}
+.prof-avatar::before{content:'';position:absolute;inset:-2px;border-radius:50%;background:conic-gradient(var(--ink),var(--gold),var(--ink));z-index:0;animation:spin 4s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.prof-avatar-inner{position:absolute;inset:3px;border-radius:50%;background:var(--s3);display:flex;align-items:center;justify-content:center;font-size:32px;z-index:1;overflow:hidden;border:2px solid var(--bg)}
+.prof-stats{flex:1;display:flex;gap:0}
+.pstat{flex:1;text-align:center;padding:4px 0}
+.pstat-n{font-size:17px;font-weight:800;color:var(--cream);line-height:1}
+.pstat-l{font-size:10px;color:var(--muted);margin-top:2px;text-transform:uppercase;letter-spacing:.04em}
+.prof-bio{margin-bottom:13px}
+.prof-name{font-weight:800;font-size:16px;color:var(--cream)}
+.prof-type{font-size:12px;color:var(--ink);font-weight:700;margin-top:1px;text-transform:uppercase;letter-spacing:.06em}
+.prof-desc{font-size:13px;color:var(--text);margin-top:6px;line-height:1.65}
+.prof-link{font-size:12px;color:var(--sapphire);margin-top:5px;display:flex;align-items:center;gap:4px;cursor:pointer}
+.prof-actions{display:grid;grid-template-columns:1fr 1fr 42px;gap:7px;margin-bottom:14px}
+.btn-follow{padding:9px;border-radius:9px;font-size:13px;font-weight:800;background:var(--ink);color:white;transition:.2s;cursor:pointer;border:none;width:100%}
+.btn-follow.following{background:var(--s4);border:1px solid var(--border2);color:var(--text)}
+.btn-appt{padding:9px;border-radius:9px;font-size:13px;font-weight:700;background:var(--s3);color:var(--text);border:1px solid var(--border2);transition:.15s;cursor:pointer;width:100%}
+.btn-more2{border-radius:9px;background:var(--s3);border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer;width:42px}
+
+/* ═══ CONTACT BAR ═══ */
+.contact-bar{display:flex;gap:0;border-top:1px solid var(--border);border-bottom:1px solid var(--border);margin-bottom:0}
+.cbar-item{flex:1;display:flex;flex-direction:column;align-items:center;padding:11px 8px;gap:3px;cursor:pointer;transition:.15s;border-right:1px solid var(--border);position:relative}
+.cbar-item:last-child{border:none}
+.cbar-item:hover{background:var(--s2)}
+.cbar-item:active{background:var(--s3)}
+.cbar-ico{font-size:18px}
+.cbar-lbl{font-size:9px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+
+/* ═══ HIGHLIGHTS ═══ */
+.hl-bar{display:flex;gap:10px;overflow-x:auto;padding:10px 14px 12px;scrollbar-width:none;border-bottom:1px solid var(--border)}
+.hl-bar::-webkit-scrollbar{display:none}
+.hl{display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;flex-shrink:0}
+.hl-ring{width:56px;height:56px;border-radius:50%;background:var(--s3);border:1.5px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:22px;transition:.15s}
+.hl:active .hl-ring{transform:scale(.92)}
+.hl-lbl{font-size:10px;font-weight:600;color:var(--muted2);max-width:58px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* ═══ STORIES ═══ */
+.stories-row{display:flex;gap:10px;overflow-x:auto;padding:10px 14px;scrollbar-width:none;border-bottom:1px solid var(--border)}
+.stories-row::-webkit-scrollbar{display:none}
+.story-item{display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;flex-shrink:0}
+.story-ring{width:52px;height:52px;border-radius:50%;padding:2px;transition:.15s}
+.story-ring.new-s{background:conic-gradient(var(--gold),var(--ink),var(--violet),var(--gold))}
+.story-ring.seen-s{background:var(--s4)}
+.story-inner{width:100%;height:100%;border-radius:50%;background:var(--s2);display:flex;align-items:center;justify-content:center;font-size:20px;border:2px solid var(--bg);overflow:hidden}
+.story-name{font-size:10px;font-weight:600;color:var(--muted2);max-width:54px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* ═══ FEED TABS ═══ */
+.feed-tabs{display:flex;border-bottom:1px solid var(--border);position:sticky;top:50px;background:var(--bg);z-index:100}
+.ftab{flex:1;padding:11px;text-align:center;font-size:18px;cursor:pointer;border-bottom:2px solid transparent;transition:.15s;color:var(--muted)}
+.ftab.on{border-bottom-color:var(--cream);color:var(--cream)}
+
+/* ═══ GRID ═══ */
+.ig-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px}
+.ig-cell{aspect-ratio:1;overflow:hidden;cursor:pointer;position:relative;background:var(--s2)}
+.ig-thumb{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:42px;transition:.2s}
+.ig-thumb img{width:100%;height:100%;object-fit:cover}
+.ig-hover{position:absolute;inset:0;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;gap:14px;opacity:0;transition:.2s}
+.ig-cell:hover .ig-hover{opacity:1}
+.ig-stat{color:white;font-size:12px;font-weight:800;display:flex;align-items:center;gap:3px}
+
+/* ═══ FEED POSTS ═══ */
+.fp{border-bottom:1px solid var(--border)}
+.fp-head{display:flex;align-items:center;gap:10px;padding:11px 14px}
+.fp-av{width:32px;height:32px;border-radius:50%;background:conic-gradient(var(--gold),var(--ink));display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;padding:2px}
+.fp-av-inner{width:100%;height:100%;border-radius:50%;background:var(--s2);display:flex;align-items:center;justify-content:center;font-size:13px;border:2px solid var(--bg)}
+.fp-uname{font-size:13px;font-weight:700;color:var(--cream);flex:1}
+.fp-tag{font-size:10px;color:var(--muted2);background:var(--s3);padding:2px 8px;border-radius:100px}
+.fp-media{width:100%;aspect-ratio:1;background:var(--s2);display:flex;align-items:center;justify-content:center;font-size:90px;overflow:hidden}
+.fp-media img{width:100%;height:100%;object-fit:cover}
+.fp-actions{display:flex;align-items:center;padding:6px 10px 4px}
+.fp-act{font-size:24px;padding:6px;cursor:pointer;transition:.1s;border-radius:8px}
+.fp-act:active{transform:scale(.82)}
+.fp-bk{margin-left:auto}
+
+/* ═══ AUTH ═══ */
+#scr-auth{background:var(--bg);display:none;flex-direction:column;align-items:center;justify-content:center;padding:20px;gap:16px;min-height:100vh}
+#scr-auth.show{display:flex}
+.auth-back{align-self:flex-start;display:flex;align-items:center;gap:6px;font-size:13px;font-weight:600;color:var(--muted2);cursor:pointer;transition:.15s}
+.auth-back:hover{color:var(--text)}
+.auth-box{background:var(--s1);border:1px solid var(--border2);border-radius:20px;padding:28px;width:100%;max-width:380px}
+.auth-tabs{display:flex;background:var(--s2);border-radius:10px;padding:3px;margin-bottom:22px;gap:3px}
+.auth-tab{flex:1;padding:9px;text-align:center;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;color:var(--muted2);transition:.2s}
+.auth-tab.on{background:var(--ink);color:white}
+
+/* ═══ APP SHELL ═══ */
+#scr-app{background:var(--bg);display:none}
+#scr-app.show{display:block}
+.app-bar{background:var(--s1);border-bottom:1px solid var(--border);height:52px;padding:0 14px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:300}
+.app-logo{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:.07em;color:var(--cream);display:flex;align-items:center;gap:7px}
+.app-logo-ico{width:26px;height:26px;border-radius:7px;background:var(--ink);display:flex;align-items:center;justify-content:center;font-size:12px}
+.app-bar-r{display:flex;align-items:center;gap:7px}
+.app-btn{width:35px;height:35px;background:var(--s2);border:1px solid var(--border);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:15px;cursor:pointer;position:relative;transition:.15s}
+.app-btn:hover{border-color:var(--border2)}
+.n-dot{position:absolute;top:5px;right:5px;width:7px;height:7px;background:var(--ink);border-radius:50%;border:1.5px solid var(--s1);animation:pulse 2s infinite;display:none}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.3)}}
+.app-user{display:flex;align-items:center;gap:7px;background:var(--s2);border:1px solid var(--border);padding:4px 10px 4px 4px;border-radius:100px;cursor:pointer}
+.app-av{width:26px;height:26px;border-radius:50%;background:var(--ink);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700}
+
+/* ═══ PAGES ═══ */
+#app-pages .page{display:none;padding:16px 14px 90px;min-height:calc(100vh - 52px);animation:fadeUp .2s ease}
+#app-pages .page.on{display:block}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* ═══ BOTTOM NAV ═══ */
+.bnav{position:fixed;bottom:0;left:0;right:0;background:var(--s1);border-top:1px solid var(--border);display:flex;z-index:200;padding-bottom:max(env(safe-area-inset-bottom),6px)}
+.bnav-item{flex:1;display:flex;flex-direction:column;align-items:center;padding:8px 4px 0;cursor:pointer;border-top:2px solid transparent;gap:3px;position:relative;transition:.1s}
+.bnav-item.on{border-top-color:var(--ink)}
+.bnav-ico{font-size:19px;line-height:1}
+.bnav-lbl{font-size:9px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+.bnav-item.on .bnav-lbl{color:var(--ink)}
+.nbadge{position:absolute;top:4px;right:50%;transform:translateX(12px);background:var(--ink);color:white;font-size:9px;font-weight:800;padding:1px 5px;border-radius:100px;min-width:15px;text-align:center}
+
+/* ═══ SHARED ═══ */
+.sec-h{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:.05em;color:var(--cream);margin-bottom:2px}
+.sec-s{font-size:12px;color:var(--muted);margin-bottom:16px}
+.card{background:var(--s1);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:12px}
+.card-h{font-size:10px;font-weight:800;color:var(--muted2);text-transform:uppercase;letter-spacing:.1em;margin-bottom:14px;display:flex;align-items:center;gap:6px}
+.card-h::before{content:'';width:3px;height:12px;background:var(--ink);border-radius:2px;flex-shrink:0}
+.sg{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:12px}
+.sc{background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:13px;position:relative;overflow:hidden}
+.sc::after{content:'';position:absolute;top:0;left:0;right:0;height:2px}
+.sr::after{background:var(--ink)}.sg2::after{background:var(--gold)}.sgr::after{background:var(--emerald)}.sb::after{background:var(--sapphire)}
+.sc-v{font-family:'Bebas Neue',sans-serif;font-size:28px;line-height:1;margin-bottom:2px}
+.sr .sc-v{color:var(--ink)}.sg2 .sc-v{color:var(--gold)}.sgr .sc-v{color:var(--emerald)}.sb .sc-v{color:var(--sapphire)}
+.sc-l{font-size:10px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.05em}
+.badge{display:inline-flex;align-items:center;padding:2px 9px;border-radius:100px;font-size:10px;font-weight:700}
+.b-p{background:rgba(232,160,69,.12);color:var(--gold)}
+.b-c{background:rgba(62,207,142,.12);color:var(--emerald)}
+.b-d{background:rgba(75,159,255,.12);color:var(--sapphire)}
+.b-x{background:rgba(214,40,57,.12);color:var(--ink)}
+.tabs{display:flex;gap:6px;margin-bottom:15px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
+.tabs::-webkit-scrollbar{display:none}
+.tab{padding:6px 14px;background:var(--s2);border:1px solid var(--border);border-radius:100px;font-size:12px;font-weight:700;color:var(--muted2);cursor:pointer;white-space:nowrap;flex-shrink:0;transition:.15s}
+.tab.on{background:var(--ink);border-color:var(--ink);color:white}
+.fi,.fs,.ft{width:100%;padding:11px 14px;background:var(--s2);border:1.5px solid var(--border);border-radius:9px;color:var(--text);font-size:14px;outline:none;transition:.15s}
+.fi:focus,.fs:focus,.ft:focus{border-color:rgba(214,40,57,.5);background:var(--s1)}
+.fi::placeholder,.ft::placeholder{color:var(--muted)}
+.fs,.fs option{background:var(--s2)}
+.ft{resize:vertical;min-height:80px;line-height:1.7}
+.fgroup{margin-bottom:13px}
+.flbl{font-size:10px;font-weight:800;color:var(--muted2);text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px;display:block}
+.btn-ink{width:100%;padding:12px;background:var(--ink);color:white;border-radius:9px;font-size:14px;font-weight:800;transition:.2s;cursor:pointer;border:none}
+.btn-ink:hover{background:var(--ink2);transform:translateY(-1px)}
+.btn-ghost{width:100%;padding:11px;background:transparent;color:var(--muted2);border:1px solid var(--border2);border-radius:9px;font-size:13px;font-weight:600;transition:.2s;margin-top:8px;cursor:pointer}
+.divider{height:1px;background:var(--border);margin:12px 0}
+.inp-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+
+/* ═══ APPOINTMENT ITEMS ═══ */
+.aitem{display:flex;align-items:center;gap:10px;padding:10px;background:var(--s2);border-radius:10px;margin-bottom:7px;cursor:pointer;border:1px solid transparent;transition:.15s}
+.aitem:hover{border-color:var(--border2)}
+.aitem-av{width:38px;height:38px;border-radius:9px;background:var(--s3);display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
+.aitem-info{flex:1;min-width:0}
+.aitem-name{font-size:13px;font-weight:700;color:var(--text)}
+.aitem-sub{font-size:11px;color:var(--muted);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.aitem-r{text-align:right;flex-shrink:0}
+.aitem-time{font-size:12px;font-weight:700}
+
+/* ═══ FINANCE ═══ */
+.fin-item{display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-bottom:1px solid var(--border)}
+.fin-l{display:flex;align-items:center;gap:10px}
+.fin-ico{width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:14px}
+.fi-in .fin-ico{background:rgba(62,207,142,.1)}
+.fi-ex .fin-ico{background:rgba(214,40,57,.1)}
+.fin-n{font-size:13px;font-weight:600}
+.fin-d{font-size:11px;color:var(--muted)}
+.fin-a{font-size:13px;font-weight:800}
+.fi-in .fin-a{color:var(--emerald)}.fi-ex .fin-a{color:var(--ink)}
+
+/* ═══ STOCK ═══ */
+.sbar{height:3px;background:var(--s4);border-radius:2px;margin-top:5px;overflow:hidden}
+.sbar-fill{height:100%;border-radius:2px;transition:.5s}
+
+/* ═══ TOGGLE ═══ */
+.toggle-r{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border)}
+.toggle-r:last-child{border:none}
+.tl{display:flex;align-items:center;gap:10px}
+.t-ico{font-size:17px;width:22px;text-align:center}
+.t-lbl{font-size:13px;font-weight:600}
+.t-sub{font-size:11px;color:var(--muted);margin-top:1px}
+.tsw{width:42px;height:23px;border-radius:100px;cursor:pointer;position:relative;transition:.25s;flex-shrink:0}
+.tsw.on{background:var(--emerald)}.tsw.off{background:var(--s4)}
+.tsw::after{content:'';position:absolute;width:17px;height:17px;background:white;border-radius:50%;top:3px;transition:.25s;box-shadow:0 1px 4px rgba(0,0,0,.3)}
+.tsw.on::after{left:3px}.tsw.off::after{left:22px}
+
+/* ═══ NOTIF ITEMS ═══ */
+.nitem{display:flex;gap:10px;padding:12px;background:var(--s2);border-radius:10px;margin-bottom:8px;border-left:3px solid transparent;animation:slideIn .25s ease}
+.nitem.unread{border-left-color:var(--ink);background:rgba(214,40,57,.05)}
+@keyframes slideIn{from{opacity:0;transform:translateX(-8px)}to{opacity:1;transform:translateX(0)}}
+.nitem-ico{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
+.ni-msg{background:rgba(75,159,255,.1)}.ni-cmt{background:rgba(232,160,69,.1)}.ni-apt{background:rgba(62,207,142,.1)}.ni-stk{background:rgba(214,40,57,.1)}
+
+/* ═══ CHART ═══ */
+.chart{display:flex;align-items:flex-end;gap:5px;height:72px;margin-top:12px}
+.bar-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px}
+.bar-body{width:100%;border-radius:4px 4px 0 0;min-height:4px}
+.bar-lbl{font-size:9px;color:var(--muted)}
+
+/* ═══ UPLOAD AREA ═══ */
+.uarea{border:2px dashed var(--border2);border-radius:12px;padding:24px;text-align:center;cursor:pointer;transition:.2s;position:relative;overflow:hidden}
+.uarea:hover{border-color:var(--ink);background:rgba(214,40,57,.04)}
+.uarea input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+
+/* ═══ ARTIST CARD ═══ */
+.arcard{display:flex;align-items:center;gap:11px;padding:12px;background:var(--s2);border-radius:12px;margin-bottom:8px;border:1px solid var(--border)}
+.arcard-av{width:46px;height:46px;border-radius:12px;background:linear-gradient(135deg,var(--ink),#7a0d15);display:flex;align-items:center;justify-content:center;font-size:21px;flex-shrink:0}
+.ar-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.d-on{background:var(--emerald);box-shadow:0 0 5px var(--emerald)}.d-bs{background:var(--gold)}.d-off{background:var(--muted)}
+
+/* ═══ STORY VIEWER ═══ */
+.sv{position:fixed;inset:0;background:#000;z-index:1000;display:none;flex-direction:column}
+.sv.open{display:flex}
+.sv-bar{display:flex;gap:3px;padding:12px 14px 6px}
+.sv-seg{flex:1;height:2px;background:rgba(255,255,255,.3);border-radius:1px;overflow:hidden}
+.sv-fill{height:100%;background:white;width:0}
+.sv-head{display:flex;align-items:center;gap:10px;padding:0 14px 10px}
+.sv-media{flex:1;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.sv-emoji{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:100px;background:var(--s2)}
+
+/* ═══ MODAL ═══ */
+.moverlay{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:600;display:none;align-items:flex-end;justify-content:center;backdrop-filter:blur(8px)}
+.moverlay.open{display:flex}
+.mbox{background:var(--s1);border-radius:22px 22px 0 0;width:100%;max-width:520px;max-height:93vh;overflow-y:auto;border-top:1px solid var(--border2)}
+.mhandle{width:34px;height:3px;background:var(--s4);border-radius:2px;margin:12px auto 16px}
+.minner{padding:0 17px 32px}
+.mtitle{font-size:17px;font-weight:800;color:var(--cream);margin-bottom:16px;letter-spacing:-.02em}
+
+/* ═══ GATE ═══ */
+.gate{position:fixed;inset:0;z-index:700;display:none;align-items:flex-end;justify-content:center;background:rgba(0,0,0,.85);backdrop-filter:blur(10px)}
+.gate.open{display:flex}
+.gate-box{background:var(--s1);border-radius:22px 22px 0 0;width:100%;max-width:480px;padding:28px;border-top:1px solid var(--border2);text-align:center}
+.gate-ico{font-size:48px;margin-bottom:12px}
+.gate-title{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:.05em;color:var(--cream);margin-bottom:6px}
+.gate-sub{font-size:14px;color:var(--muted2);line-height:1.6;margin-bottom:22px}
+.gate-btns{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+
+/* ═══ DIRECTIONS MODAL ═══ */
+.map-preview{width:100%;height:160px;background:var(--s2);border-radius:12px;margin-bottom:14px;display:flex;align-items:center;justify-content:center;font-size:48px;position:relative;overflow:hidden;cursor:pointer}
+.map-preview iframe{position:absolute;inset:0;width:100%;height:100%;border:none;border-radius:12px}
+.dir-step{display:flex;gap:12px;padding:10px 0;border-bottom:1px solid var(--border)}
+.dir-step:last-child{border:none}
+.dir-num{width:24px;height:24px;border-radius:50%;background:var(--ink);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:white;flex-shrink:0;margin-top:1px}
+
+/* ═══ BOOKING FORM ═══ */
+.slot-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.slot{padding:8px 4px;background:var(--s2);border:1.5px solid var(--border);border-radius:8px;text-align:center;font-size:12px;font-weight:700;cursor:pointer;transition:.15s}
+.slot:hover{border-color:var(--muted2)}
+.slot.picked{background:var(--ink);border-color:var(--ink);color:white}
+.slot.busy{opacity:.35;pointer-events:none;text-decoration:line-through}
+
+/* ═══ EMAIL PREVIEW ═══ */
+.email-preview{background:#fff;border-radius:12px;padding:20px;color:#333;font-size:13px;line-height:1.7}
+.email-preview h2{color:#d62839;font-size:18px;margin-bottom:8px}
+.email-preview .ep-section{background:#f8f8f8;border-radius:8px;padding:12px;margin:10px 0}
+.email-preview .ep-label{font-size:10px;font-weight:800;color:#888;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px}
+
+/* ═══ CHAT ═══ */
+.clist-item{display:flex;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid var(--border);cursor:pointer}
+.clist-av{width:42px;height:42px;border-radius:11px;background:var(--s2);display:flex;align-items:center;justify-content:center;font-size:19px;flex-shrink:0;position:relative}
+.c-online{position:absolute;bottom:1px;right:1px;width:9px;height:9px;border-radius:50%;background:var(--emerald);border:2px solid var(--bg)}
+.cmt-inp-row{display:flex;gap:8px;align-items:center}
+.cmt-inp{flex:1;padding:10px 13px;background:var(--s2);border:1px solid var(--border);border-radius:100px;color:var(--text);font-size:13px;outline:none}
+.cmt-inp::placeholder{color:var(--muted)}
+.cmt-send{padding:10px 15px;background:var(--ink);color:white;border-radius:100px;font-size:12px;font-weight:800;cursor:pointer;border:none}
+.cmt-box{background:var(--s2);border-radius:10px;padding:12px;max-height:180px;overflow-y:auto;margin-bottom:10px}
+.cmt{display:flex;gap:8px;margin-bottom:9px}
+.cmt:last-child{margin:0}
+.cmt-av{width:26px;height:26px;border-radius:50%;background:var(--s3);display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0}
+.cmt-u{font-size:11px;font-weight:700;color:var(--cream)}
+.cmt-t{font-size:13px;color:var(--text);line-height:1.5;margin-top:1px}
+
+/* ═══ TOAST ═══ */
+#toast{position:fixed;bottom:82px;left:50%;transform:translateX(-50%);background:var(--s4);color:var(--text);padding:10px 20px;border-radius:100px;font-size:13px;font-weight:700;z-index:9999;border:1px solid var(--border2);box-shadow:0 8px 28px rgba(0,0,0,.5);opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap;max-width:90vw;text-align:center}
+
+@media(min-width:600px){.sg{grid-template-columns:repeat(4,1fr)}.ig-grid{grid-template-columns:repeat(4,1fr)}}
+</style>
+</head>
+<body>
+
+<!-- ████ PUBLIC ████ -->
+<div id="pub" class="screen show">
+  <div class="pub-bar">
+    <div class="pub-logo">
+      <div class="pub-logo-mark" id="p-logo-ico">🗡️</div>
+      <span id="p-logo-name">DARK ROSE</span>
+    </div>
+    <div class="pub-bar-btn" onclick="openModal('m-search')">🔍</div>
+    <div class="pub-bar-btn" id="p-msg-btn" onclick="gatedAction('message')" style="display:none">✉️</div>
+    <div class="pill pill-red" onclick="openAuth('login')" id="signin-btn">Sign In</div>
+    <div class="pill pill-ghost" onclick="openAdminLogin()">Staff</div>
+  </div>
+
+  <!-- Profile -->
+  <div class="pub-profile">
+    <div class="prof-row">
+      <div class="prof-avatar">
+        <div class="prof-avatar-inner" id="p-av">🗡️</div>
+      </div>
+      <div class="prof-stats">
+        <div class="pstat"><div class="pstat-n" id="p-posts">184</div><div class="pstat-l">Posts</div></div>
+        <div class="pstat"><div class="pstat-n">2.4K</div><div class="pstat-l">Followers</div></div>
+        <div class="pstat"><div class="pstat-n">4.8⭐</div><div class="pstat-l">Rating</div></div>
+      </div>
+    </div>
+    <div class="prof-bio">
+      <div class="prof-name" id="p-bname">Dark Rose Tattoo</div>
+      <div class="prof-type" id="p-btype">🗡️ Tattoo Studio · Izmir, Turkey</div>
+      <div class="prof-desc" id="p-bdesc">Professional tattoo studio in Alsancak.<br>✦ Realism · Blackwork · Minimalist · Tribal · Piercing<br>📍 Alsancak, Izmir · ⏰ Mon–Sat 10:00–20:00</div>
+      <div class="prof-link" onclick="openModal('m-directions')">🗺️ Get Directions</div>
+    </div>
+    <div class="prof-actions">
+      <button class="btn-follow" id="follow-btn" onclick="gatedAction('follow')">Follow</button>
+      <button class="btn-appt" onclick="openBookingModal()">📅 Book Now</button>
+      <div class="btn-more2" onclick="openModal('m-info')">⋯</div>
+    </div>
+  </div>
+
+  <!-- Contact Bar -->
+  <div class="contact-bar" id="p-contact-bar">
+    <div class="cbar-item" onclick="openModal('m-directions')">
+      <div class="cbar-ico">🗺️</div><div class="cbar-lbl">Directions</div>
+    </div>
+    <div class="cbar-item" onclick="callStudio()">
+      <div class="cbar-ico">📞</div><div class="cbar-lbl">Call</div>
+    </div>
+    <div class="cbar-item" onclick="openModal('m-booking')">
+      <div class="cbar-ico">📅</div><div class="cbar-lbl">Book</div>
+    </div>
+    <div class="cbar-item" onclick="gatedAction('message')">
+      <div class="cbar-ico">✉️</div><div class="cbar-lbl">Message</div>
+    </div>
+    <div class="cbar-item" onclick="openInstagram()">
+      <div class="cbar-ico">📸</div><div class="cbar-lbl">Instagram</div>
+    </div>
+  </div>
+
+  <!-- Highlights -->
+  <div class="hl-bar" id="p-hl">
+    <div class="hl" onclick="openHl('Realism')"><div class="hl-ring">🦅</div><div class="hl-lbl">Realism</div></div>
+    <div class="hl" onclick="openHl('Blackwork')"><div class="hl-ring">💀</div><div class="hl-lbl">Blackwork</div></div>
+    <div class="hl" onclick="openHl('Minimalist')"><div class="hl-ring">🌸</div><div class="hl-lbl">Minimal</div></div>
+    <div class="hl" onclick="openHl('Tribal')"><div class="hl-ring">🔱</div><div class="hl-lbl">Tribal</div></div>
+    <div class="hl" onclick="openHl('Watercolor')"><div class="hl-ring">🎨</div><div class="hl-lbl">Watercolor</div></div>
+    <div class="hl" onclick="openHl('Piercing')"><div class="hl-ring">💎</div><div class="hl-lbl">Piercing</div></div>
+    <div class="hl" onclick="openHl('Team')"><div class="hl-ring">🪡</div><div class="hl-lbl">Team</div></div>
+    <div class="hl" onclick="openHl('Healed')"><div class="hl-ring">✨</div><div class="hl-lbl">Healed</div></div>
+  </div>
+
+  <!-- Stories -->
+  <div class="stories-row" id="p-stories"></div>
+
+  <!-- Feed tabs -->
+  <div class="feed-tabs">
+    <div class="ftab on" onclick="switchView('grid',this)">⊞</div>
+    <div class="ftab" id="ft-feed" onclick="switchView('feed',this)">☰</div>
+    <div class="ftab" onclick="switchView('reels',this)">▶</div>
+    <div class="ftab" onclick="switchView('tagged',this)">🏷️</div>
+  </div>
+  <div id="p-grid" class="ig-grid"></div>
+  <div id="p-feed" style="display:none;padding-bottom:80px"></div>
+  <div id="p-reels" style="display:none;padding:40px 14px;text-align:center;color:var(--muted)"><div style="font-size:52px;margin-bottom:12px">🎬</div><div style="font-size:14px;font-weight:700">No reels yet</div></div>
+  <div id="p-tagged" style="display:none;padding:40px 14px;text-align:center;color:var(--muted)"><div style="font-size:52px;margin-bottom:12px">🏷️</div><div style="font-size:14px;font-weight:700">No tagged posts</div></div>
+</div>
+
+<!-- ████ AUTH ████ -->
+<div id="scr-auth">
+  <div class="auth-back" onclick="showPublic()">← Back</div>
+  <div class="auth-box">
+    <div class="auth-tabs">
+      <div class="auth-tab on" id="atab-login" onclick="switchAuth('login')">Sign In</div>
+      <div class="auth-tab" id="atab-reg" onclick="switchAuth('register')">Register</div>
+    </div>
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:.1em;color:var(--cream);margin-bottom:4px">🗡️ INKOS</div>
+    <div style="font-size:13px;color:var(--muted);margin-bottom:22px" id="auth-sub">Welcome back</div>
+    <div id="auth-reg-extra" style="display:none"><div class="inp-row"><input class="fi" placeholder="First name" id="reg-fname" style="margin-bottom:9px"><input class="fi" placeholder="Last name" id="reg-lname" style="margin-bottom:9px"></div></div>
+    <input class="fi" placeholder="Email address" type="email" id="auth-email" style="margin-bottom:9px">
+    <input class="fi" placeholder="Password" type="password" id="auth-pw" style="margin-bottom:9px">
+    <div id="auth-reg-extra2" style="display:none"><input class="fi" placeholder="Confirm password" type="password" style="margin-bottom:9px"></div>
+    <button class="btn-ink" id="auth-submit" onclick="doAuth()">Sign In →</button>
+    <div style="text-align:center;font-size:12px;color:var(--muted);margin:14px 0;position:relative">
+      <span style="background:var(--s1);padding:0 10px;position:relative;z-index:1">or staff login</span>
+      <div style="position:absolute;top:50%;left:0;right:0;height:1px;background:var(--border2)"></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+      <div onclick="doLogin('admin')" style="padding:12px 8px;background:var(--s2);border:1.5px solid var(--border);border-radius:9px;font-size:12px;font-weight:700;color:var(--muted2);text-align:center;cursor:pointer">👑 Admin</div>
+      <div onclick="doLogin('artist')" style="padding:12px 8px;background:var(--s2);border:1.5px solid var(--border);border-radius:9px;font-size:12px;font-weight:700;color:var(--muted2);text-align:center;cursor:pointer">🪡 Artist</div>
+    </div>
+  </div>
+</div>
+
+<!-- ████ APP ████ -->
+<div id="scr-app">
+  <div class="app-bar">
+    <div class="app-logo"><div class="app-logo-ico" id="a-ico">🗡️</div><span id="a-name">INKOS</span></div>
+    <div class="app-bar-r">
+      <div class="app-btn" onclick="navTo('notifications')">🔔<div class="n-dot" id="n-dot"></div></div>
+      <div class="app-user" onclick="navTo('profile')"><div class="app-av" id="a-av">A</div><div style="font-size:12px;font-weight:600" id="a-uname">Admin</div></div>
+    </div>
+  </div>
+  <div id="app-pages"></div>
+  <div class="bnav" id="bnav"></div>
+</div>
+
+<!-- ████ STORY VIEWER ████ -->
+<div class="sv" id="sv">
+  <div class="sv-bar" id="sv-bar"></div>
+  <div class="sv-head">
+    <div style="width:34px;height:34px;border-radius:50%;background:conic-gradient(var(--gold),var(--ink));display:flex;align-items:center;justify-content:center;padding:2px">
+      <div style="width:100%;height:100%;border-radius:50%;background:#000;display:flex;align-items:center;justify-content:center" id="sv-av">🪡</div>
+    </div>
+    <div><div style="font-size:13px;font-weight:700;color:white" id="sv-name">Artist</div><div style="font-size:10px;color:rgba(255,255,255,.5)" id="sv-time">Just now</div></div>
+    <button onclick="closeSV()" style="margin-left:auto;font-size:22px;color:white;background:none;border:none;cursor:pointer">✕</button>
+  </div>
+  <div class="sv-media" id="sv-media"></div>
+  <div style="padding:14px;display:flex;gap:8px;align-items:center">
+    <input placeholder="Reply to story..." style="flex:1;padding:10px 14px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.2);border-radius:100px;color:white;font-size:13px;outline:none" onclick="gatedAction('storyMsg')">
+    <span style="font-size:22px;cursor:pointer" onclick="gatedAction('like')">🤍</span>
+  </div>
+</div>
+
+<!-- ████ GATE ████ -->
+<div class="gate" id="gate" onclick="if(event.target===this)closeGate()">
+  <div class="gate-box">
+    <div class="gate-ico" id="gate-ico">🔐</div>
+    <div class="gate-title">Members Only</div>
+    <div class="gate-sub" id="gate-sub">Create a free account to interact with this studio.</div>
+    <div class="gate-btns">
+      <button onclick="closeGate();openAuth('login')" style="padding:13px;background:var(--ink);color:white;border-radius:10px;font-size:14px;font-weight:800;cursor:pointer;border:none">Sign In</button>
+      <button onclick="closeGate();openAuth('register')" style="padding:13px;background:var(--s3);color:var(--text);border:1px solid var(--border2);border-radius:10px;font-size:14px;font-weight:700;cursor:pointer">Register</button>
+    </div>
+    <div style="margin-top:14px;font-size:12px;color:var(--muted);cursor:pointer" onclick="closeGate()">Maybe later</div>
+  </div>
+</div>
+
+<!-- ████ MODALS ████ -->
+
+<!-- Post detail -->
+<div class="moverlay" id="m-post" onclick="if(event.target===this)closeModals()">
+  <div class="mbox"><div class="mhandle"></div><div id="m-post-body"></div></div>
+</div>
+
+<!-- Booking -->
+<div class="moverlay" id="m-booking" onclick="if(event.target===this)closeModals()">
+  <div class="mbox">
+    <div class="mhandle"></div>
+    <div class="minner">
+      <div class="mtitle">📅 Book an Appointment</div>
+
+      <!-- Step indicator -->
+      <div style="display:flex;gap:0;margin-bottom:20px" id="book-steps">
+        <div style="flex:1;text-align:center;padding-bottom:8px;border-bottom:2px solid var(--ink);font-size:11px;font-weight:800;color:var(--ink)" id="bstep-1">1 · Info</div>
+        <div style="flex:1;text-align:center;padding-bottom:8px;border-bottom:2px solid var(--border);font-size:11px;font-weight:700;color:var(--muted)" id="bstep-2">2 · Details</div>
+        <div style="flex:1;text-align:center;padding-bottom:8px;border-bottom:2px solid var(--border);font-size:11px;font-weight:700;color:var(--muted)" id="bstep-3">3 · Confirm</div>
+      </div>
+
+      <!-- Step 1: Personal info -->
+      <div id="book-p1">
+        <div class="inp-row">
+          <div class="fgroup"><label class="flbl">First Name *</label><input class="fi" id="b-fname" placeholder="John"></div>
+          <div class="fgroup"><label class="flbl">Last Name *</label><input class="fi" id="b-lname" placeholder="Doe"></div>
+        </div>
+        <div class="fgroup"><label class="flbl">Email Address *</label><input class="fi" type="email" id="b-email" placeholder="john@example.com"></div>
+        <div class="fgroup"><label class="flbl">Phone Number *</label><input class="fi" type="tel" id="b-phone" placeholder="+1 555 000 0000"></div>
+        <div class="fgroup"><label class="flbl">Date *</label><input type="date" class="fi" id="b-date" oninput="renderSlots()"></div>
+        <div class="fgroup"><label class="flbl">Preferred Time *</label>
+          <div class="slot-grid" id="b-slots">
+            <div class="slot" onclick="pickSlot(this)">10:00</div>
+            <div class="slot" onclick="pickSlot(this)">11:00</div>
+            <div class="slot busy">12:00</div>
+            <div class="slot" onclick="pickSlot(this)">13:00</div>
+            <div class="slot" onclick="pickSlot(this)">14:00</div>
+            <div class="slot" onclick="pickSlot(this)">15:00</div>
+            <div class="slot" onclick="pickSlot(this)">16:00</div>
+            <div class="slot" onclick="pickSlot(this)">17:00</div>
+            <div class="slot" onclick="pickSlot(this)">18:00</div>
+            <div class="slot busy">19:00</div>
+          </div>
+        </div>
+        <button class="btn-ink" onclick="bookStep(2)">Next →</button>
+      </div>
+
+      <!-- Step 2: Tattoo details -->
+      <div id="book-p2" style="display:none">
+        <div class="fgroup"><label class="flbl">Artist *</label>
+          <select class="fs" id="b-artist">
+            <option value="">Select artist...</option>
+            <option>Mert Demir — Realism / Blackwork</option>
+            <option>Selin Yildiz — Minimalist / Fine Line</option>
+            <option>Ali Koc — Tribal / Geometric</option>
+            <option>Deniz Acar — Watercolor / New School</option>
+          </select>
+        </div>
+        <div class="fgroup"><label class="flbl">Tattoo Style *</label>
+          <select class="fs" id="b-style">
+            <option value="">Select style...</option>
+            <option>Realism</option><option>Blackwork</option><option>Minimalist / Fine Line</option>
+            <option>Tribal</option><option>Watercolor</option><option>New School</option>
+            <option>Traditional</option><option>Neo-Traditional</option><option>Geometric</option>
+          </select>
+        </div>
+        <div class="fgroup"><label class="flbl">Body Area *</label>
+          <select class="fs" id="b-area">
+            <option value="">Select area...</option>
+            <option>Wrist</option><option>Forearm</option><option>Upper Arm</option><option>Shoulder</option>
+            <option>Back</option><option>Chest</option><option>Ribcage</option><option>Leg</option>
+            <option>Thigh</option><option>Foot / Ankle</option><option>Neck</option><option>Hand</option>
+          </select>
+        </div>
+        <div class="fgroup"><label class="flbl">Estimated Size</label>
+          <select class="fs" id="b-size">
+            <option>Small (5–10 cm)</option><option>Medium (10–20 cm)</option>
+            <option>Large (20+ cm)</option><option>Full sleeve / back piece</option>
+          </select>
+        </div>
+        <div class="fgroup"><label class="flbl">Estimated Duration</label>
+          <select class="fs" id="b-dur">
+            <option>1 hour</option><option>2 hours</option><option>3 hours</option>
+            <option>4 hours</option><option>5+ hours (multiple sessions)</option>
+          </select>
+        </div>
+        <div class="fgroup"><label class="flbl">Description *</label>
+          <textarea class="ft" id="b-desc" placeholder="Describe your tattoo idea in as much detail as possible..."></textarea>
+        </div>
+        <div class="uarea" style="margin-bottom:14px" id="b-ref-area">
+          <input type="file" accept="image/*" onchange="previewRef(this)">
+          <div style="font-size:28px;margin-bottom:6px">📎</div>
+          <div style="font-size:13px;font-weight:700;color:var(--muted2)">Upload reference image (optional)</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:3px">JPG, PNG max 10MB</div>
+        </div>
+        <div class="fgroup"><label class="flbl">Additional Notes</label>
+          <textarea class="ft" id="b-notes" placeholder="Allergies, skin conditions, previous tattoo work, special requests..."></textarea>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <button class="btn-ghost" style="margin:0" onclick="bookStep(1)">← Back</button>
+          <button class="btn-ink" style="margin:0" onclick="bookStep(3)">Next →</button>
+        </div>
+      </div>
+
+      <!-- Step 3: Confirm -->
+      <div id="book-p3" style="display:none">
+        <div style="background:var(--s2);border-radius:12px;padding:14px;margin-bottom:14px" id="b-summary"></div>
+        <div style="background:rgba(214,40,57,.06);border:1px solid rgba(214,40,57,.2);border-radius:10px;padding:12px;margin-bottom:14px;font-size:12px;color:var(--muted2);display:flex;gap:8px">
+          <span style="font-size:16px;flex-shrink:0">📧</span>
+          <span>A confirmation email will be sent to your address once the studio approves your booking. It will include appointment details, pre-care instructions, post-care instructions, and directions.</span>
+        </div>
+        <div class="fgroup">
+          <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;font-size:13px;color:var(--muted2)">
+            <input type="checkbox" id="b-consent" style="margin-top:3px;accent-color:var(--ink)">
+            I agree to the studio's cancellation policy (24-hour notice required) and confirm that all provided information is accurate.
+          </label>
+        </div>
+        <button class="btn-ink" onclick="submitBooking()">🗡️ Send Booking Request</button>
+        <button class="btn-ghost" onclick="bookStep(2)">← Back</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Directions Modal -->
+<div class="moverlay" id="m-directions" onclick="if(event.target===this)closeModals()">
+  <div class="mbox">
+    <div class="mhandle"></div>
+    <div class="minner">
+      <div class="mtitle">🗺️ How to Find Us</div>
+      <div class="map-preview" id="map-preview" onclick="openGoogleMaps()">
+        <div style="text-align:center">
+          <div style="font-size:48px;margin-bottom:8px">📍</div>
+          <div style="font-size:13px;font-weight:700;color:var(--text)" id="dir-addr">Şair Eşref Blvd No:18, Alsancak</div>
+          <div style="font-size:11px;color:var(--muted)">Tap to open in Google Maps</div>
+        </div>
+      </div>
+      <div id="dir-steps">
+        <div class="dir-step">
+          <div class="dir-num">1</div>
+          <div style="font-size:13px;color:var(--text)" id="dir-step1">Head towards Alsancak district from the city center.</div>
+        </div>
+        <div class="dir-step">
+          <div class="dir-num">2</div>
+          <div style="font-size:13px;color:var(--text)" id="dir-step2">Find Şair Eşref Boulevard — there is parking available on the street.</div>
+        </div>
+        <div class="dir-step">
+          <div class="dir-num">3</div>
+          <div style="font-size:13px;color:var(--text)" id="dir-step3">Look for the Dark Rose Tattoo sign at No:18. We are on the ground floor.</div>
+        </div>
+      </div>
+      <div class="divider"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">
+        <div style="background:var(--s2);border-radius:10px;padding:12px">
+          <div style="font-size:10px;color:var(--muted);text-transform:uppercase;font-weight:800;letter-spacing:.06em;margin-bottom:3px">📞 Phone</div>
+          <div style="font-size:13px;font-weight:700" id="dir-phone">+90 232 000 00 00</div>
+        </div>
+        <div style="background:var(--s2);border-radius:10px;padding:12px">
+          <div style="font-size:10px;color:var(--muted);text-transform:uppercase;font-weight:800;letter-spacing:.06em;margin-bottom:3px">⏰ Hours</div>
+          <div style="font-size:13px;font-weight:700" id="dir-hours">Mon–Sat 10:00–20:00</div>
+        </div>
+      </div>
+      <button class="btn-ink" onclick="openGoogleMaps()">📍 Open in Google Maps</button>
+      <button class="btn-ghost" onclick="callStudio()">📞 Call Us</button>
+    </div>
+  </div>
+</div>
+
+<!-- Studio Info -->
+<div class="moverlay" id="m-info" onclick="if(event.target===this)closeModals()">
+  <div class="mbox">
+    <div class="mhandle"></div>
+    <div class="minner">
+      <div class="mtitle" id="info-title">🗡️ Dark Rose Tattoo</div>
+      <div id="info-body"></div>
+      <button class="btn-ink" style="margin-top:16px" onclick="closeModals();openBookingModal()">📅 Book Now</button>
+    </div>
+  </div>
+</div>
+
+<!-- Message -->
+<div class="moverlay" id="m-msg" onclick="if(event.target===this)closeModals()">
+  <div class="mbox">
+    <div class="mhandle"></div>
+    <div class="minner">
+      <div class="mtitle">✉️ Message the Studio</div>
+      <div style="background:var(--s2);border-radius:12px;padding:14px;min-height:100px;display:flex;flex-direction:column;gap:9px;margin-bottom:12px;max-height:200px;overflow-y:auto" id="pub-msgs">
+        <div style="align-self:flex-start;background:var(--s3);padding:9px 13px;border-radius:12px 12px 12px 4px;font-size:13px;max-width:85%">👋 Hey there! How can we help you today?</div>
+      </div>
+      <div style="display:flex;gap:8px">
+        <input class="cmt-inp" placeholder="Type a message..." id="pub-msg-inp" onkeydown="if(event.key==='Enter')sendPubMsg()">
+        <button class="cmt-send" onclick="sendPubMsg()">→</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Upload post -->
+<div class="moverlay" id="m-upload" onclick="if(event.target===this)closeModals()">
+  <div class="mbox">
+    <div class="mhandle"></div>
+    <div class="minner">
+      <div class="mtitle">📸 New Post</div>
+      <div class="uarea" id="up-area"><input type="file" accept="image/*,video/*" onchange="previewUp(this)"><div style="font-size:34px;margin-bottom:8px">🗡️</div><div style="font-size:13px;font-weight:700;color:var(--muted2)">Select photo or video</div></div>
+      <div class="fgroup" style="margin-top:14px"><label class="flbl">Caption</label><textarea class="ft" id="up-cap" placeholder="Write about this piece..."></textarea></div>
+      <div class="fgroup"><label class="flbl">Style</label><select class="fs" id="up-style"><option>Realism</option><option>Blackwork</option><option>Minimalist</option><option>Tribal</option><option>Watercolor</option><option>New School</option><option>Traditional</option><option>Piercing</option></select></div>
+      <div class="fgroup"><label class="flbl">Artist</label><select class="fs" id="up-artist"><option>Mert Demir</option><option>Selin Yildiz</option><option>Ali Koc</option><option>Deniz Acar</option></select></div>
+      <button class="btn-ink" onclick="submitUpload()">Publish</button>
+    </div>
+  </div>
+</div>
+
+<!-- Story Upload -->
+<div class="moverlay" id="m-story" onclick="if(event.target===this)closeModals()">
+  <div class="mbox">
+    <div class="mhandle"></div>
+    <div class="minner">
+      <div class="mtitle">⭕ Add Story</div>
+      <div style="background:rgba(214,40,57,.06);border:1px solid rgba(214,40,57,.18);border-radius:10px;padding:12px;margin-bottom:14px;font-size:12px;color:var(--muted2)">⏱️ Videos up to <b style="color:var(--text)">30 seconds</b>, visible for <b style="color:var(--text)">24 hours</b></div>
+      <div class="uarea" id="story-up-area"><input type="file" accept="image/*,video/*" onchange="previewStory(this)"><div style="font-size:34px;margin-bottom:8px">🎬</div><div style="font-size:13px;font-weight:700;color:var(--muted2)">Photo or video (max 30s)</div></div>
+      <div class="fgroup" style="margin-top:14px"><label class="flbl">Artist</label><select class="fs" id="story-artist"><option>Mert Demir</option><option>Selin Yildiz</option><option>Ali Koc</option><option>Deniz Acar</option></select></div>
+      <div class="fgroup"><label class="flbl">Caption (optional)</label><input class="fi" id="story-cap" placeholder="Short caption..."></div>
+      <button class="btn-ink" onclick="submitStory()">Add Story</button>
+    </div>
+  </div>
+</div>
+
+<!-- Search -->
+<div class="moverlay" id="m-search" onclick="if(event.target===this)closeModals()">
+  <div class="mbox">
+    <div class="mhandle"></div>
+    <div class="minner">
+      <div class="mtitle">🔍 Search</div>
+      <input class="fi" placeholder="Artist, style, tag..." oninput="doSearch(this.value)" style="margin-bottom:14px" autofocus>
+      <div id="search-res"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Email Preview (Admin) -->
+<div class="moverlay" id="m-email-preview" onclick="if(event.target===this)closeModals()">
+  <div class="mbox">
+    <div class="mhandle"></div>
+    <div class="minner">
+      <div class="mtitle">📧 Email Preview</div>
+      <div style="font-size:11px;color:var(--muted);margin-bottom:12px">This is what the customer will receive when you approve their booking.</div>
+      <div id="email-preview-body"></div>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+// ══════════════════════════════════
+// STUDIO SETTINGS
+// ══════════════════════════════════
+const S = {
+  name: 'Dark Rose Tattoo',
+  logo: '🗡️',
+  type: '🗡️ Tattoo Studio · Izmir, Turkey',
+  desc: 'Professional tattoo studio in Alsancak.\n✦ Realism · Blackwork · Minimalist · Tribal · Piercing\n📍 Alsancak, Izmir · ⏰ Mon–Sat 10:00–20:00',
+  phone: '+90 232 000 00 00',
+  address: 'Şair Eşref Blvd No:18, Alsancak, Izmir',
+  instagram: '@darkrosetattoo',
+  website: 'darkrosetattoo.com',
+  mapsUrl: 'https://maps.google.com/?q=Alsancak+Izmir',
+  hours: 'Mon–Sat 10:00–20:00',
+  dir_step1: 'Head towards Alsancak district from the city center.',
+  dir_step2: 'Find Şair Eşref Boulevard — parking available on the street.',
+  dir_step3: 'Look for the Dark Rose Tattoo sign at No:18. Ground floor.',
+  // Email templates
+  emailBeforeCare: `• Do not consume alcohol for 24 hours before your appointment.\n• Eat a good meal 2 hours before — sessions can be long.\n• Moisturize the area 3 days before (do not apply on the day).\n• Wear comfortable clothing that provides easy access to the tattoo area.\n• Get a good night's sleep the night before.\n• Do not apply any numbing cream without consulting your artist first.`,
+  emailAfterCare: `• Keep the tattoo covered with the film/wrap for the first 2–4 hours.\n• Wash gently with lukewarm water and fragrance-free soap.\n• Apply a thin layer of unscented moisturizer 2–3 times daily.\n• Do not pick, scratch, or peel the tattoo.\n• Avoid direct sunlight and swimming pools for at least 3 weeks.\n• If any redness, swelling, or discharge persists after 5 days, consult a doctor.\n• Touch-ups (if needed) are free within the first 60 days.`,
+  emailFooter: `Questions? Reply to this email or call us at ${'+90 232 000 00 00'}.`,
+};
+
+// ══════════════════════════════════
+// STATE
+// ══════════════════════════════════
+let role = null, loggedIn = false, currentUser = null;
+let followed = false, unread = 3;
+let selectedSlot = null;
+const FEATS = {
+  likes:true, comments:true, booking:true, messaging:true,
+  stories:true, highlights:true, feedView:true,
+  apptNotif:true, msgNotif:true, cmtNotif:true, stockAlert:true,
+};
+
+const NOTIFS = [
+  {id:1,cls:'ni-msg',ico:'✉️',title:'New Message — Emma T.',body:'"Looking to book a realism sleeve consultation"',time:'2 min ago',unread:true},
+  {id:2,cls:'ni-cmt',ico:'💬',title:'New Comment — ink_lover',body:'"Eagle post: The shading is unreal! 🔥"',time:'8 min ago',unread:true},
+  {id:3,cls:'ni-apt',ico:'📅',title:'Booking Request — James R.',body:'Tribal · Leg · Tomorrow 11:00 · Pending approval',time:'15 min ago',unread:true},
+  {id:4,cls:'ni-stk',ico:'📦',title:'Low Stock Alert',body:'Black ink — critically low: 3 bottles remaining',time:'2 hrs ago',unread:false},
+];
+
+const STORIES = [
+  {id:1,artist:'Mert Demir',ico:'🦅',time:'2 hrs ago',seen:false,emoji:'🦅',cap:'Just finished this realism eagle!'},
+  {id:2,artist:'Selin Yildiz',ico:'🌸',time:'4 hrs ago',seen:false,emoji:'💉',cap:'Minimalist session ✨'},
+  {id:3,artist:'Ali Koc',ico:'⚡',time:'6 hrs ago',seen:true,emoji:'🔱',cap:'Tribal in progress'},
+  {id:4,artist:'Deniz Acar',ico:'🎨',time:'Yesterday',seen:true,emoji:'🦋',cap:'Watercolor healed result!'},
+];
+
+const POSTS = [
+  {id:1,emoji:'🦅',artist:'Mert Demir',style:'Realism',likes:234,liked:false,cmts:[{u:'ink_lover',ico:'🧑',t:'The shading is unreal! 🔥'},{u:'tattoo_fan',ico:'👩',t:'Going for something similar next month'}],cap:'Bald eagle realism on the upper arm. 6-hour session, single sitting.',tags:['realism','eagle','arm','blackandgrey']},
+  {id:2,emoji:'🌸',artist:'Selin Yildiz',style:'Minimalist',likes:189,liked:false,cmts:[{u:'emma_t',ico:'👩‍🦱',t:'So delicate 🌸'}],cap:'Minimalist floral wrist piece. Fine line technique.',tags:['minimalist','fineline','floral','wrist']},
+  {id:3,emoji:'💀',artist:'Mert Demir',style:'Blackwork',likes:312,liked:false,cmts:[{u:'ink_lover',ico:'🧑',t:'INSANE detail 💀'},{u:'james_r',ico:'🧔',t:'Booking you for mine!'}],cap:'Blackwork skull upper back. Bold lines, solid fills.',tags:['blackwork','skull','back','bold']},
+  {id:4,emoji:'🐉',artist:'Ali Koc',style:'Tribal',likes:156,liked:false,cmts:[],cap:'Full sleeve tribal dragon. 8-hour session across 2 days.',tags:['tribal','dragon','sleeve']},
+  {id:5,emoji:'🌙',artist:'Selin Yildiz',style:'Minimalist',likes:278,liked:false,cmts:[{u:'luna_s',ico:'👩',t:'Exactly what I want!'},{u:'emma_t',ico:'👩‍🦱',t:'Perfection ✨'}],cap:'Moon and stars nape tattoo. Ultra-fine lines.',tags:['minimalist','moon','stars','nape']},
+  {id:6,emoji:'🔱',artist:'Ali Koc',style:'Tribal',likes:145,liked:false,cmts:[],cap:'Geometric tribal thigh piece. 3-hour session.',tags:['tribal','geometric','thigh']},
+  {id:7,emoji:'🦋',artist:'Deniz Acar',style:'Watercolor',likes:367,liked:false,cmts:[{u:'color_lover',ico:'👩‍🎨',t:'The colors are ALIVE 😍'}],cap:'Watercolor butterfly chest piece. Healed — 3 months later.',tags:['watercolor','butterfly','chest','healed']},
+  {id:8,emoji:'🐺',artist:'Mert Demir',style:'Realism',likes:198,liked:false,cmts:[{u:'james_r',ico:'🧔',t:'Wolf realism on another level 🐺'}],cap:'Wolf realism shoulder. Eyes are the focal point.',tags:['realism','wolf','shoulder']},
+  {id:9,emoji:'🗡️',artist:'Mert Demir',style:'Blackwork',likes:211,liked:false,cmts:[],cap:'Blackwork dagger inner forearm. Classic placement.',tags:['blackwork','dagger','forearm']},
+  {id:10,emoji:'🌿',artist:'Selin Yildiz',style:'Minimalist',likes:289,liked:false,cmts:[{u:'luna_s',ico:'👩',t:'Botanical queen! 🌿'}],cap:'Botanical series — lavender and sage.',tags:['minimalist','botanical','plants']},
+  {id:11,emoji:'🦋',artist:'Deniz Acar',style:'Watercolor',likes:176,liked:false,cmts:[],cap:'New school flame upper arm. Bold colors.',tags:['newschool','fire','arm']},
+  {id:12,emoji:'💎',artist:'Ali Koc',style:'Piercing',likes:134,liked:false,cmts:[],cap:'Industrial piercing with titanium bar.',tags:['piercing','industrial']},
+];
+
+const ARTISTS = [
+  {id:1,name:'Mert Demir',spec:'Realism / Blackwork',rating:'4.9',jobs:142,status:'online',ico:'🦅',monthly:'$1,840'},
+  {id:2,name:'Selin Yildiz',spec:'Minimalist / Fine Line',rating:'4.8',jobs:98,status:'busy',ico:'🌸',monthly:'$1,220'},
+  {id:3,name:'Ali Koc',spec:'Tribal / Geometric',rating:'4.7',jobs:76,status:'online',ico:'⚡',monthly:'$980'},
+  {id:4,name:'Deniz Acar',spec:'Watercolor / New School',rating:'4.9',jobs:61,status:'offline',ico:'🎨',monthly:'$810'},
+];
+
+const APPOINTMENTS = [
+  {id:1,customer:'Emma Thompson',email:'emma@email.com',phone:'+1 555 100 0001',artist:'Mert Demir',type:'Realism Portrait',area:'Upper Arm',time:'10:00',dur:'3 hours',date:'Today',status:'confirmed',price:'$250',notes:'No allergies. First tattoo.'},
+  {id:2,customer:'James Rodriguez',email:'james@email.com',phone:'+1 555 100 0002',artist:'Selin Yildiz',type:'Minimalist',area:'Wrist',time:'13:30',dur:'1 hour',date:'Today',status:'pending',price:'$120',notes:'Has healed scar tissue in area.'},
+  {id:3,customer:'Sophie Laurent',email:'sophie@email.com',phone:'+1 555 100 0003',artist:'Mert Demir',type:'Blackwork',area:'Back',time:'16:00',dur:'4 hours',date:'Today',status:'confirmed',price:'$380',notes:'Vegetarian, no lanolin products.'},
+  {id:4,customer:'Marcus Lee',email:'marcus@email.com',phone:'+1 555 100 0004',artist:'Ali Koc',type:'Tribal',area:'Leg',time:'11:00',dur:'2 hours',date:'Tomorrow',status:'pending',price:'$200',notes:''},
+  {id:5,customer:'Zara Khan',email:'zara@email.com',phone:'+1 555 100 0005',artist:'Selin Yildiz',type:'Fine Line',area:'Wrist',time:'14:00',dur:'45 min',date:'Tomorrow',status:'confirmed',price:'$95',notes:''},
+];
+
+const STOCK = [
+  {name:'Black Ink',cat:'Ink',ico:'🖤',count:3,max:20,unit:'bottles'},
+  {name:'Color Set 12pc',cat:'Ink',ico:'🎨',count:8,max:15,unit:'sets'},
+  {name:'Needle #5 Round',cat:'Needles',ico:'💉',count:45,max:100,unit:'pcs'},
+  {name:'Latex Gloves M',cat:'Safety',ico:'🧤',count:2,max:10,unit:'boxes'},
+  {name:'Transfer Paper',cat:'Supplies',ico:'📄',count:28,max:50,unit:'sheets'},
+  {name:'Antiseptic',cat:'Safety',ico:'🧴',count:6,max:12,unit:'bottles'},
+  {name:'Vaseline',cat:'Aftercare',ico:'💊',count:14,max:30,unit:'tubs'},
+  {name:'Piercing Jewelry',cat:'Piercing',ico:'💎',count:34,max:50,unit:'pcs'},
+];
+
+const FINANCE = {
+  income:[
+    {name:'Realism — Emma T.',date:'Today',amount:'$250',ico:'🦅',cat:'Session'},
+    {name:'Minimalist — Sophie L.',date:'Today',amount:'$120',ico:'🌸',cat:'Session'},
+    {name:'Piercing — Zara K.',date:'Yesterday',amount:'$65',ico:'💎',cat:'Piercing'},
+    {name:'Tribal Sleeve — Marcus L.',date:'Feb 28',amount:'$600',ico:'🔱',cat:'Session'},
+    {name:'Blackwork — James R.',date:'Feb 27',amount:'$380',ico:'💀',cat:'Session'},
+    {name:'Gift Card Sale',date:'Feb 25',amount:'$150',ico:'🎁',cat:'Gift Card'},
+  ],
+  expenses:[
+    {name:'Ink Restock Order',date:'Yesterday',amount:'-$140',ico:'🛒',cat:'Supplies'},
+    {name:'Needle Sets x10',date:'Feb 28',amount:'-$85',ico:'💉',cat:'Supplies'},
+    {name:'Studio Rent',date:'Mar 1',amount:'-$2,800',ico:'🏠',cat:'Fixed'},
+    {name:'Equipment Maintenance',date:'Feb 26',amount:'-$120',ico:'🔧',cat:'Equipment'},
+    {name:'Marketing / Social',date:'Feb 20',amount:'-$200',ico:'📢',cat:'Marketing'},
+  ],
+};
+
+// ══════════════════════════════════
+// BUILD PUBLIC PAGE
+// ══════════════════════════════════
+function buildPublic() {
+  document.getElementById('p-logo-ico').textContent = S.logo;
+  document.getElementById('p-logo-name').textContent = S.name.split(' ').slice(0,2).join(' ').toUpperCase();
+  document.getElementById('p-av').textContent = S.logo;
+  document.getElementById('p-bname').textContent = S.name;
+  document.getElementById('p-btype').textContent = S.type;
+  document.getElementById('p-bdesc').innerHTML = S.desc.replace(/\n/g,'<br>');
+  document.getElementById('p-posts').textContent = POSTS.length;
+
+  // Directions
+  document.getElementById('dir-addr').textContent = S.address;
+  document.getElementById('dir-phone').textContent = S.phone;
+  document.getElementById('dir-hours').textContent = S.hours;
+  document.getElementById('dir-step1').textContent = S.dir_step1;
+  document.getElementById('dir-step2').textContent = S.dir_step2;
+  document.getElementById('dir-step3').textContent = S.dir_step3;
+
+  buildStories();
+  buildGrid();
+  buildFeed();
+  applyFeats();
+}
+
+function buildStories() {
+  document.getElementById('p-stories').innerHTML = STORIES.map((s,i) =>
+    `<div class="story-item" onclick="openSV(${i})">
+      <div class="story-ring ${s.seen?'seen-s':'new-s'}">
+        <div class="story-inner">${s.ico}</div>
+      </div>
+      <div class="story-name">${s.artist.split(' ')[0]}</div>
+    </div>`).join('');
+}
+
+function buildGrid() {
+  document.getElementById('p-grid').innerHTML = POSTS.map(p =>
+    `<div class="ig-cell" onclick="openPost(${p.id})">
+      <div class="ig-thumb">${p.emoji}</div>
+      <div class="ig-hover">
+        <div class="ig-stat">❤️ ${p.likes}</div>
+        <div class="ig-stat">💬 ${p.cmts.length}</div>
+      </div>
+    </div>`).join('');
+}
+
+function buildFeed() {
+  document.getElementById('p-feed').innerHTML = POSTS.map(p => {
+    const a = ARTISTS.find(x=>x.name===p.artist);
+    return `<div class="fp">
+      <div class="fp-head">
+        <div class="fp-av"><div class="fp-av-inner">${a?.ico||'🗡️'}</div></div>
+        <div class="fp-uname">${p.artist}</div>
+        <div class="fp-tag">${p.style}</div>
+      </div>
+      <div class="fp-media">${p.emoji}</div>
+      <div class="fp-actions">
+        ${FEATS.likes?`<button class="fp-act" id="fl-${p.id}" onclick="toggleLike(${p.id})">${p.liked?'❤️':'🤍'}</button>`:''}
+        ${FEATS.comments?`<button class="fp-act" onclick="openPost(${p.id})">💬</button>`:''}
+        <button class="fp-act" onclick="gatedAction('save')">🔗</button>
+        <button class="fp-act fp-bk" onclick="gatedAction('save')">🔖</button>
+      </div>
+      <div style="padding:0 14px 3px;font-size:13px;font-weight:700;color:var(--cream)">${p.likes} likes</div>
+      <div style="padding:0 14px 5px;font-size:13px;line-height:1.55"><b style="color:var(--cream)">${p.artist}</b> ${p.cap}</div>
+      <div style="padding:0 14px 8px;display:flex;flex-wrap:wrap;gap:4px">${p.tags.map(t=>`<span style="color:var(--sapphire);font-size:12px">#${t}</span>`).join(' ')}</div>
+      ${FEATS.comments && p.cmts.length ? `<div onclick="openPost(${p.id})" style="padding:0 14px 10px;font-size:12px;color:var(--muted);cursor:pointer">View all ${p.cmts.length} comments</div>` : ''}
+      <div style="padding:0 14px 14px;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em">2 HOURS AGO</div>
+    </div>`;
+  }).join('');
+}
+
+function applyFeats() {
+  document.getElementById('p-hl').style.display = FEATS.highlights ? 'flex' : 'none';
+  document.getElementById('p-stories').style.display = FEATS.stories ? 'flex' : 'none';
+  document.getElementById('p-msg-btn').style.display = FEATS.messaging ? 'flex' : 'none';
+  const apptBtn = document.querySelector('.btn-appt');
+  if (apptBtn) apptBtn.style.display = FEATS.booking ? '' : 'none';
+  document.getElementById('ft-feed').style.display = FEATS.feedView ? '' : 'none';
+  buildFeed();
+}
+
+function switchView(type, el) {
+  document.querySelectorAll('.ftab').forEach(t=>t.classList.remove('on'));
+  el.classList.add('on');
+  ['grid','feed','reels','tagged'].forEach(t=>{
+    const e=document.getElementById('p-'+t);
+    if(e) e.style.display='none';
+  });
+  const t = document.getElementById('p-'+type);
+  if (t) t.style.display = type==='grid'?'grid':'block';
+}
+
+// ══════════════════════════════════
+// AUTH
+// ══════════════════════════════════
+function openAuth(tab) {
+  document.getElementById('pub').classList.remove('show');
+  document.getElementById('scr-auth').classList.add('show');
+  switchAuth(tab);
+}
+function switchAuth(tab) {
+  document.getElementById('atab-login').classList.toggle('on', tab==='login');
+  document.getElementById('atab-reg').classList.toggle('on', tab==='register');
+  document.getElementById('auth-sub').textContent = tab==='login' ? 'Welcome back' : 'Create your free account';
+  document.getElementById('auth-submit').textContent = tab==='login' ? 'Sign In →' : 'Create Account →';
+  document.getElementById('auth-reg-extra').style.display = tab==='register' ? 'block' : 'none';
+  document.getElementById('auth-reg-extra2').style.display = tab==='register' ? 'block' : 'none';
+}
+function doAuth() {
+  const email = document.getElementById('auth-email').value;
+  if (!email) { toast('⚠️ Please enter your email'); return; }
+  loggedIn = true;
+  currentUser = { name: email.split('@')[0], email };
+  toast('✓ Welcome back, ' + currentUser.name);
+  showPublic();
+  const bar = document.querySelector('.pub-bar');
+  document.getElementById('signin-btn')?.remove();
+  const av = document.createElement('div');
+  av.style.cssText = 'width:30px;height:30px;border-radius:50%;background:var(--ink);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:white;cursor:pointer;flex-shrink:0';
+  av.textContent = currentUser.name[0].toUpperCase();
+  bar.appendChild(av);
+}
+function openAdminLogin() { openAuth('login'); }
+function doLogin(r) {
+  role = r;
+  document.getElementById('scr-auth').classList.remove('show');
+  document.getElementById('pub').classList.remove('show');
+  document.getElementById('scr-app').classList.add('show');
+  document.getElementById('a-ico').textContent = S.logo;
+  document.getElementById('a-name').textContent = S.name.split(' ')[0].toUpperCase();
+  document.getElementById('a-av').textContent = r==='admin' ? '👑' : '🪡';
+  document.getElementById('a-uname').textContent = r==='admin' ? 'Admin' : 'Mert';
+  buildNav(); navTo('dashboard'); updateDot();
+}
+function showPublic() {
+  document.getElementById('scr-auth').classList.remove('show');
+  document.getElementById('scr-app').classList.remove('show');
+  document.getElementById('pub').classList.add('show');
+}
+
+// ══════════════════════════════════
+// GATE
+// ══════════════════════════════════
+const GATE_MSG = {
+  like:{ico:'❤️',sub:'Sign in to like posts and support the artists.'},
+  comment:{ico:'💬',sub:'Create a free account to leave comments.'},
+  follow:{ico:'🔔',sub:'Follow us to stay updated on new work and offers.'},
+  message:{ico:'✉️',sub:'Sign in to message the studio directly.'},
+  save:{ico:'🔖',sub:'Save your favorite tattoos to your collection.'},
+  storyMsg:{ico:'📩',sub:'Sign in to reply to stories.'},
+};
+function gatedAction(action) {
+  if (loggedIn) {
+    if (action==='message') { openModal('m-msg'); return; }
+    if (action==='follow') { toggleFollow(); return; }
+    if (action==='like') { toast('❤️'); return; }
+    toast('✓ Done');
+    return;
+  }
+  const g = GATE_MSG[action] || {ico:'🔐',sub:'Sign in to continue.'};
+  document.getElementById('gate-ico').textContent = g.ico;
+  document.getElementById('gate-sub').textContent = g.sub;
+  document.getElementById('gate').classList.add('open');
+}
+function closeGate() { document.getElementById('gate').classList.remove('open'); }
+function toggleFollow() {
+  followed = !followed;
+  const btn = document.getElementById('follow-btn');
+  btn.textContent = followed ? '✓ Following' : 'Follow';
+  btn.className = 'btn-follow' + (followed ? ' following' : '');
+  toast(followed ? '✓ Following ' + S.name : 'Unfollowed');
+}
+function toggleLike(id) {
+  if (!loggedIn && !role) { gatedAction('like'); return; }
+  const p = POSTS.find(x=>x.id===id);
+  if (!p) return;
+  p.liked = !p.liked; p.likes += p.liked ? 1 : -1;
+  const b = document.getElementById('fl-'+id);
+  if (b) b.textContent = p.liked ? '❤️' : '🤍';
+}
+
+// ══════════════════════════════════
+// CONTACT
+// ══════════════════════════════════
+function callStudio() {
+  if (S.phone) window.open('tel:' + S.phone.replace(/\s/g,''));
+  else toast('Phone not configured');
+}
+function openGoogleMaps() {
+  window.open(S.mapsUrl || 'https://maps.google.com/?q=' + encodeURIComponent(S.address), '_blank');
+}
+function openInstagram() {
+  const h = S.instagram?.replace('@','') || '';
+  if (h) window.open('https://instagram.com/' + h, '_blank');
+  else toast('Instagram not configured');
+}
+function openBookingModal() { openModal('m-booking'); }
+
+// ══════════════════════════════════
+// BOOKING (3-step form)
+// ══════════════════════════════════
+let bData = {};
+function bookStep(n) {
+  // Validate step 1
+  if (n === 2) {
+    const fname = document.getElementById('b-fname').value.trim();
+    const lname = document.getElementById('b-lname').value.trim();
+    const email = document.getElementById('b-email').value.trim();
+    const phone = document.getElementById('b-phone').value.trim();
+    const date = document.getElementById('b-date').value;
+    if (!fname || !lname) { toast('⚠️ Please enter your full name'); return; }
+    if (!email || !email.includes('@')) { toast('⚠️ Please enter a valid email'); return; }
+    if (!phone) { toast('⚠️ Please enter your phone number'); return; }
+    if (!date) { toast('⚠️ Please select a date'); return; }
+    if (!selectedSlot) { toast('⚠️ Please select a time slot'); return; }
+    bData.fname = fname; bData.lname = lname; bData.email = email;
+    bData.phone = phone; bData.date = date; bData.time = selectedSlot;
+  }
+  // Validate step 2
+  if (n === 3) {
+    const artist = document.getElementById('b-artist').value;
+    const style = document.getElementById('b-style').value;
+    const area = document.getElementById('b-area').value;
+    const desc = document.getElementById('b-desc').value.trim();
+    if (!artist) { toast('⚠️ Please select an artist'); return; }
+    if (!style) { toast('⚠️ Please select a tattoo style'); return; }
+    if (!area) { toast('⚠️ Please select a body area'); return; }
+    if (!desc) { toast('⚠️ Please describe your tattoo idea'); return; }
+    bData.artist = artist; bData.style = style; bData.area = area;
+    bData.size = document.getElementById('b-size').value;
+    bData.dur = document.getElementById('b-dur').value;
+    bData.desc = desc;
+    bData.notes = document.getElementById('b-notes').value;
+    buildSummary();
+  }
+  ['book-p1','book-p2','book-p3'].forEach((id,i) => {
+    document.getElementById(id).style.display = (i === n-1) ? 'block' : 'none';
+  });
+  ['bstep-1','bstep-2','bstep-3'].forEach((id,i) => {
+    const el = document.getElementById(id);
+    const active = i === n-1;
+    el.style.color = active ? 'var(--ink)' : 'var(--muted)';
+    el.style.borderBottomColor = active ? 'var(--ink)' : 'var(--border)';
+    el.style.fontWeight = active ? '800' : '700';
+  });
+}
+function pickSlot(el) {
+  document.getElementById('b-slots').querySelectorAll('.slot:not(.busy)').forEach(s => s.classList.remove('picked'));
+  el.classList.add('picked');
+  selectedSlot = el.textContent;
+}
+function renderSlots() {} // future: load busy slots from DB
+function buildSummary() {
+  document.getElementById('b-summary').innerHTML = `
+    <div style="font-size:13px;font-weight:800;color:var(--cream);margin-bottom:10px">Booking Summary</div>
+    ${[
+      ['👤','Customer', bData.fname + ' ' + bData.lname],
+      ['📧','Email', bData.email],
+      ['📞','Phone', bData.phone],
+      ['📅','Date & Time', bData.date + ' at ' + bData.time],
+      ['🪡','Artist', bData.artist],
+      ['🗡️','Style', bData.style],
+      ['📍','Body Area', bData.area],
+      ['📐','Size', bData.size],
+      ['⏱️','Duration', bData.dur],
+      ['📝','Description', bData.desc.substring(0,60) + (bData.desc.length > 60 ? '…' : '')],
+    ].map(([i,l,v]) => `<div style="display:flex;gap:8px;padding:5px 0;border-bottom:1px solid var(--border);font-size:12px">
+      <span>${i}</span>
+      <span style="color:var(--muted);width:80px;flex-shrink:0">${l}</span>
+      <span style="color:var(--text);font-weight:600">${v}</span>
+    </div>`).join('')}
+  `;
+}
+function submitBooking() {
+  if (!document.getElementById('b-consent').checked) {
+    toast('⚠️ Please accept the cancellation policy'); return;
+  }
+  // Add to appointments list
+  const newAppt = {
+    id: Date.now(),
+    customer: bData.fname + ' ' + bData.lname,
+    email: bData.email,
+    phone: bData.phone,
+    artist: bData.artist.split('—')[0].trim(),
+    type: bData.style,
+    area: bData.area,
+    time: bData.time,
+    dur: bData.dur,
+    date: 'Pending',
+    status: 'pending',
+    price: 'TBD',
+    notes: bData.notes || '',
+    desc: bData.desc,
+    size: bData.size,
+  };
+  APPOINTMENTS.push(newAppt);
+  addNotif('ni-apt','📅','New Booking Request',`${newAppt.customer} — ${newAppt.type} · ${newAppt.area} · ${newAppt.time}`,'Just now');
+  closeModals();
+  toast('🎉 Request sent! We\'ll confirm via email shortly.');
+  // Reset form
+  selectedSlot = null; bData = {};
+  document.getElementById('b-fname').value='';
+  document.getElementById('b-lname').value='';
+  document.getElementById('b-email').value='';
+  document.getElementById('b-phone').value='';
+  document.getElementById('b-date').value='';
+  document.getElementById('b-desc').value='';
+  document.getElementById('b-notes').value='';
+  document.getElementById('b-consent').checked=false;
+  document.getElementById('b-slots').querySelectorAll('.slot').forEach(s=>s.classList.remove('picked'));
+  bookStep(1);
+}
+
+// ══════════════════════════════════
+// EMAIL SYSTEM
+// ══════════════════════════════════
+function buildConfirmationEmail(appt) {
+  return `
+    <div class="email-preview">
+      <div style="background:#d62839;padding:16px 20px;border-radius:8px 8px 0 0;margin:-20px -20px 16px">
+        <div style="color:white;font-size:22px;font-weight:900;letter-spacing:.05em">${S.logo} ${S.name.toUpperCase()}</div>
+        <div style="color:rgba(255,255,255,.8);font-size:12px;margin-top:2px">Appointment Confirmation</div>
+      </div>
+      <h2>Your appointment is confirmed! 🗡️</h2>
+      <p style="color:#555;margin-bottom:14px">Hi ${appt.customer.split(' ')[0]}, we're excited to see you. Here are your booking details:</p>
+      <div class="ep-section">
+        <div class="ep-label">Appointment Details</div>
+        <table style="width:100%;border-collapse:collapse">
+          ${[['📅 Date',appt.date],['🕐 Time',appt.time],['⏱️ Duration',appt.dur],['🪡 Artist',appt.artist],['🗡️ Style',appt.type],['📍 Body Area',appt.area]].map(([l,v])=>`<tr><td style="padding:4px 0;color:#888;font-size:12px;width:110px">${l}</td><td style="padding:4px 0;font-weight:700;font-size:13px">${v}</td></tr>`).join('')}
+        </table>
+      </div>
+      <div class="ep-section" style="border-left:3px solid #e8a045">
+        <div class="ep-label" style="color:#e8a045">⚠️ Before Your Appointment</div>
+        <div style="white-space:pre-line;font-size:13px;color:#444;margin-top:6px">${S.emailBeforeCare}</div>
+      </div>
+      <div class="ep-section" style="border-left:3px solid #3ecf8e">
+        <div class="ep-label" style="color:#3ecf8e">✅ After Your Appointment</div>
+        <div style="white-space:pre-line;font-size:13px;color:#444;margin-top:6px">${S.emailAfterCare}</div>
+      </div>
+      <div class="ep-section" style="border-left:3px solid #4b9fff">
+        <div class="ep-label" style="color:#4b9fff">🗺️ How to Find Us</div>
+        <div style="font-size:13px;color:#444;margin-top:6px"><b>${S.address}</b><br>${S.hours}<br><a href="${S.mapsUrl}" style="color:#4b9fff">📍 Open in Google Maps</a></div>
+      </div>
+      <div style="background:#fff8f0;border:1px solid #f0e0c8;border-radius:8px;padding:12px;margin-top:12px">
+        <div style="font-size:12px;color:#888;font-weight:800;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">📞 Need to reschedule?</div>
+        <div style="font-size:13px;color:#444">${S.emailFooter}</div>
+      </div>
+      <div style="margin-top:16px;text-align:center;font-size:11px;color:#aaa">
+        ${S.name} · ${S.address}<br>
+        <a href="${S.website?'https://'+S.website:'#'}" style="color:#d62839">${S.website}</a>
+      </div>
+    </div>`;
+}
+
+function showEmailPreview(apptId) {
+  const a = APPOINTMENTS.find(x=>x.id===apptId);
+  if (!a) return;
+  document.getElementById('email-preview-body').innerHTML = buildConfirmationEmail(a);
+  openModal('m-email-preview');
+}
+
+function approveAndSendEmail(apptId) {
+  const a = APPOINTMENTS.find(x=>x.id===apptId);
+  if (!a) return;
+  a.status = 'confirmed';
+  // In production: send via EmailJS / Supabase Edge Function / SMTP
+  // For now: show email preview + mailto fallback
+  const subject = encodeURIComponent(`Appointment Confirmed — ${S.name}`);
+  const body = encodeURIComponent(
+    `Hi ${a.customer.split(' ')[0]},\n\nYour appointment at ${S.name} is confirmed!\n\nDate: ${a.date}\nTime: ${a.time}\nArtist: ${a.artist}\nStyle: ${a.type}\n\nBefore your appointment:\n${S.emailBeforeCare}\n\nAfter care:\n${S.emailAfterCare}\n\nAddress: ${S.address}\n\nSee you soon!\n${S.name}`
+  );
+  window.open(`mailto:${a.email}?subject=${subject}&body=${body}`);
+  closeModals();
+  toast('✓ Confirmed! Email drafted in your mail app.');
+  if (role) { renderAppts(); renderDashboard(); }
+}
+
+// ══════════════════════════════════
+// APP NAV
+// ══════════════════════════════════
+const NAVS = {
+  admin:[{id:'dashboard',ico:'🏠',lbl:'Home'},{id:'appointments',ico:'📅',lbl:'Bookings',badge:2},{id:'gallery',ico:'🗡️',lbl:'Gallery'},{id:'messages',ico:'💬',lbl:'Messages',badge:3},{id:'more',ico:'⋯',lbl:'Manage'}],
+  artist:[{id:'dashboard',ico:'🏠',lbl:'Home'},{id:'appointments',ico:'📅',lbl:'Bookings'},{id:'gallery',ico:'🗡️',lbl:'Gallery'},{id:'messages',ico:'💬',lbl:'Messages'},{id:'profile',ico:'👤',lbl:'Profile'}],
+};
+const EXTRA = ['profile','stock','finance','artists','notifications','settings'];
+
+function buildNav() {
+  const items = NAVS[role] || NAVS.admin;
+  document.getElementById('bnav').innerHTML = items.map(n =>
+    `<div class="bnav-item" id="bnav-${n.id}" onclick="navTo('${n.id}')">
+      <div class="bnav-ico">${n.ico}</div>
+      <div class="bnav-lbl">${n.lbl}</div>
+      ${n.badge ? `<div class="nbadge">${n.badge}</div>` : ''}
+    </div>`).join('');
+  const all = [...new Set([...items.map(n=>n.id),...EXTRA])];
+  document.getElementById('app-pages').innerHTML = all.map(id=>`<div class="page" id="pg-${id}"></div>`).join('');
+}
+
+function navTo(id) {
+  document.querySelectorAll('.bnav-item').forEach(n=>n.classList.remove('on'));
+  const ni = document.getElementById('bnav-'+id);
+  if (ni) ni.classList.add('on');
+  document.querySelectorAll('#app-pages .page').forEach(p=>p.classList.remove('on'));
+  const pg = document.getElementById('pg-'+id);
+  if (pg) { pg.classList.add('on'); renderPage(id); }
+}
+
+const RENDERS = {
+  dashboard: renderDashboard, appointments: renderAppts, gallery: renderGallery,
+  messages: renderMsgs, more: renderMore, profile: renderProfile,
+  stock: renderStock, finance: renderFinance, artists: renderArtists,
+  notifications: renderNotifs, settings: renderSettings,
+};
+function renderPage(id) { if (RENDERS[id]) RENDERS[id](); }
+function updateDot() {
+  const d = document.getElementById('n-dot');
+  if (d) d.style.display = unread > 0 ? 'block' : 'none';
+}
+function addNotif(cls, ico, title, body, time) {
+  NOTIFS.unshift({id:Date.now(),cls,ico,title,body,time,unread:true});
+  unread++; updateDot();
+}
+
+// ══════════════════════════════════
+// DASHBOARD
+// ══════════════════════════════════
+function renderDashboard() {
+  const isArt = role === 'artist';
+  document.getElementById('pg-dashboard').innerHTML = `
+    <div class="sec-h">${isArt ? 'Hello Mert 🪡' : 'Overview 👑'}</div>
+    <div class="sec-s">${new Date().toLocaleDateString('en-US',{weekday:'long',day:'numeric',month:'long'})}</div>
+    <div class="sg">
+      <div class="sc sr"><div style="font-size:18px;margin-bottom:5px">📅</div><div class="sc-v">${isArt?3:8}</div><div class="sc-l">Today's Bookings</div></div>
+      <div class="sc sg2"><div style="font-size:18px;margin-bottom:5px">💰</div><div class="sc-v">${isArt?'$620':'$1.2K'}</div><div class="sc-l">Today Revenue</div></div>
+      <div class="sc sgr"><div style="font-size:18px;margin-bottom:5px">⏳</div><div class="sc-v">${APPOINTMENTS.filter(a=>a.status==='pending').length}</div><div class="sc-l">Pending Approval</div></div>
+      <div class="sc sb"><div style="font-size:18px;margin-bottom:5px">⭐</div><div class="sc-v">4.8</div><div class="sc-l">Avg Rating</div></div>
+    </div>
+    <div class="card"><div class="card-h">Revenue — This Week</div>
+      <div class="chart">${['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].map((d,i)=>{const h=[38,62,28,80,52,95,68][i];return `<div class="bar-col"><div class="bar-body" style="height:${h}%;background:var(--ink);opacity:.65"></div><div class="bar-lbl">${d}</div></div>`;}).join('')}</div>
+    </div>
+    ${unread > 0 ? `
+    <div class="card" style="border-color:rgba(214,40,57,.25);background:rgba(214,40,57,.04)">
+      <div class="card-h" style="color:var(--ink)">🔔 New Activity</div>
+      ${NOTIFS.filter(n=>n.unread).slice(0,3).map(n=>`
+        <div class="nitem unread" onclick="navTo('notifications');closeModals()" style="cursor:pointer">
+          <div class="nitem-ico ${n.cls}">${n.ico}</div>
+          <div><div style="font-size:13px;font-weight:700;color:var(--cream)">${n.title}</div><div style="font-size:12px;color:var(--muted2);margin-top:2px">${n.body}</div><div style="font-size:10px;color:var(--muted);margin-top:4px">${n.time}</div></div>
+        </div>`).join('')}
+      <div style="text-align:center;padding:8px 0;cursor:pointer;color:var(--ink);font-size:12px;font-weight:800" onclick="navTo('notifications')">View All →</div>
+    </div>` : ''}
+    <div class="card">
+      <div class="card-h">⏳ Pending Approval</div>
+      ${APPOINTMENTS.filter(a=>a.status==='pending').length === 0
+        ? '<div style="text-align:center;color:var(--muted);font-size:13px;padding:10px">All caught up ✓</div>'
+        : APPOINTMENTS.filter(a=>a.status==='pending').map(a=>apptRow(a)).join('')}
+    </div>
+    <div class="card"><div class="card-h">📅 Today's Confirmed</div>${APPOINTMENTS.filter(a=>a.date==='Today'&&a.status==='confirmed').map(a=>apptRow(a)).join('')}</div>
+    ${!isArt ? `<div class="card"><div class="card-h">⚠️ Low Stock</div>${STOCK.filter(s=>s.count<=s.max*.3).map(s=>`<div class="aitem" onclick="navTo('stock')"><div class="aitem-av">${s.ico}</div><div class="aitem-info"><div class="aitem-name">${s.name}</div><div class="aitem-sub">${s.cat} · ${s.count} ${s.unit} left</div></div><div class="badge b-x">Critical</div></div>`).join('')}</div>` : ''}
+  `;
+}
+
+// ══════════════════════════════════
+// APPOINTMENTS
+// ══════════════════════════════════
+function apptRow(a) {
+  const cls={pending:'b-p',confirmed:'b-c',done:'b-d',cancelled:'b-x'};
+  const lbl={pending:'Pending',confirmed:'Confirmed',done:'Done',cancelled:'Cancelled'};
+  return `<div class="aitem" onclick="showApptDetail(${a.id})">
+    <div class="aitem-av">💆</div>
+    <div class="aitem-info">
+      <div class="aitem-name">${a.customer}</div>
+      <div class="aitem-sub">${a.type} · ${a.area} · ${a.artist}</div>
+    </div>
+    <div class="aitem-r">
+      <div class="aitem-time">${a.time}</div>
+      <div class="badge ${cls[a.status]}">${lbl[a.status]}</div>
+    </div>
+  </div>`;
+}
+
+function renderAppts() {
+  document.getElementById('pg-appointments').innerHTML = `
+    <div class="sec-h">Bookings 📅</div>
+    <div class="sec-s">Manage all appointments</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">
+      <div style="background:var(--s2);border-radius:10px;padding:12px;text-align:center">
+        <div style="font-size:22px;font-weight:900;color:var(--gold)">${APPOINTMENTS.filter(a=>a.status==='pending').length}</div>
+        <div style="font-size:10px;color:var(--muted);font-weight:700;text-transform:uppercase">Pending</div>
+      </div>
+      <div style="background:var(--s2);border-radius:10px;padding:12px;text-align:center">
+        <div style="font-size:22px;font-weight:900;color:var(--emerald)">${APPOINTMENTS.filter(a=>a.status==='confirmed').length}</div>
+        <div style="font-size:10px;color:var(--muted);font-weight:700;text-transform:uppercase">Confirmed</div>
+      </div>
+    </div>
+    <div class="tabs" id="appt-tabs">
+      ${['All','Today','Tomorrow','Pending','Confirmed'].map((t,i)=>`<div class="tab ${i===0?'on':''}" onclick="activateTab(this);filterAppts('${t}')">${t}</div>`).join('')}
+    </div>
+    <div id="appt-list">${APPOINTMENTS.map(a=>apptRow(a)).join('')}</div>
+    ${role==='admin'?`<button class="btn-ink" style="margin-top:12px" onclick="openModal('m-booking')">+ Add Appointment</button>`:''}
+  `;
+}
+
+function filterAppts(filter) {
+  let list = APPOINTMENTS;
+  if (filter==='Today') list = list.filter(a=>a.date==='Today');
+  else if (filter==='Tomorrow') list = list.filter(a=>a.date==='Tomorrow');
+  else if (filter==='Pending') list = list.filter(a=>a.status==='pending');
+  else if (filter==='Confirmed') list = list.filter(a=>a.status==='confirmed');
+  document.getElementById('appt-list').innerHTML = list.length ? list.map(a=>apptRow(a)).join('') : '<div style="text-align:center;color:var(--muted);padding:24px;font-size:13px">No appointments found</div>';
+}
+
+function showApptDetail(id) {
+  const a = APPOINTMENTS.find(x=>x.id===id);
+  if (!a) return;
+  document.getElementById('m-post-body').innerHTML = `
+    <div class="minner">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px">
+        <div class="mtitle" style="margin:0">${a.customer}</div>
+        <button onclick="closeModals()" style="font-size:19px;color:var(--muted);cursor:pointer">✕</button>
+      </div>
+      <div class="badge ${a.status==='pending'?'b-p':a.status==='confirmed'?'b-c':'b-d'}" style="margin-bottom:14px">${a.status.toUpperCase()}</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">
+        ${[['📅','Date',a.date],['🕐','Time',a.time],['⏱️','Duration',a.dur||'—'],['💰','Price',a.price],['🪡','Artist',a.artist],['🗡️','Style',a.type],['📍','Area',a.area],['📐','Size',a.size||'—']].map(([i,l,v])=>`<div style="background:var(--s2);padding:10px;border-radius:9px"><div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px">${i} ${l}</div><div style="font-size:12px;font-weight:700">${v}</div></div>`).join('')}
+      </div>
+      <div style="background:var(--s2);border-radius:10px;padding:12px;margin-bottom:12px">
+        <div style="font-size:10px;color:var(--muted);font-weight:800;text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">📞 Contact</div>
+        <div style="font-size:13px;font-weight:600;margin-bottom:3px">${a.email}</div>
+        <div style="font-size:13px;font-weight:600;color:var(--muted2)">${a.phone}</div>
+      </div>
+      ${a.desc ? `<div style="background:var(--s2);border-radius:10px;padding:12px;margin-bottom:12px"><div style="font-size:10px;color:var(--muted);font-weight:800;text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">📝 Description</div><div style="font-size:13px;color:var(--text);line-height:1.6">${a.desc}</div></div>` : ''}
+      ${a.notes ? `<div style="background:var(--s2);border-radius:10px;padding:12px;margin-bottom:12px"><div style="font-size:10px;color:var(--muted);font-weight:800;text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">⚠️ Notes</div><div style="font-size:13px;color:var(--text);line-height:1.6">${a.notes}</div></div>` : ''}
+      ${a.status === 'pending' ? `
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
+          <button class="btn-ink" style="background:var(--emerald)" onclick="approveAndSendEmail(${a.id})">✓ Approve & Email</button>
+          <button class="btn-ink" style="background:var(--s4);color:var(--muted2)" onclick="declineAppt(${a.id})">✗ Decline</button>
+        </div>
+        <button class="btn-ghost" onclick="showEmailPreview(${a.id})" style="margin-top:0">👁️ Preview Confirmation Email</button>
+      ` : `
+        <button class="btn-ink" onclick="showEmailPreview(${a.id})">📧 Resend Confirmation Email</button>
+        <button class="btn-ghost" onclick="navTo('messages');closeModals()">💬 Message Customer</button>
+      `}
+    </div>`;
+  openModal('m-post');
+}
+
+function declineAppt(id) {
+  const a = APPOINTMENTS.find(x=>x.id===id);
+  if (a) a.status = 'cancelled';
+  closeModals();
+  toast('✗ Appointment declined');
+}
+
+// ══════════════════════════════════
+// GALLERY
+// ══════════════════════════════════
+function renderGallery() {
+  document.getElementById('pg-gallery').innerHTML = `
+    <div class="sec-h">Gallery 🗡️</div>
+    <div class="sec-s">Manage posts & stories</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">
+      <button class="btn-ink" onclick="openModal('m-upload')">📸 New Post</button>
+      <button class="btn-ink" style="background:var(--violet)" onclick="openModal('m-story')">⭕ New Story</button>
+    </div>
+    <div class="tabs">${['All','Realism','Blackwork','Minimalist','Tribal','Watercolor','Piercing'].map((t,i)=>`<div class="tab ${i===0?'on':''}" onclick="activateTab(this)">${t}</div>`).join('')}</div>
+    <div class="ig-grid" style="margin-bottom:12px">${POSTS.map(p=>`<div class="ig-cell" onclick="openPost(${p.id})"><div class="ig-thumb">${p.emoji}</div><div class="ig-hover"><div class="ig-stat">❤️ ${p.likes}</div><div class="ig-stat">💬 ${p.cmts.length}</div></div></div>`).join('')}</div>
+    <div class="card"><div class="card-h">Active Stories — ${STORIES.filter(s=>!s.seen).length} new</div>
+      ${STORIES.map((s,i)=>`<div class="aitem" onclick="openSV(${i})"><div class="aitem-av" style="border-radius:50%">${s.ico}</div><div class="aitem-info"><div class="aitem-name">${s.artist}</div><div class="aitem-sub">${s.cap}</div></div><div class="badge ${s.seen?'b-d':'b-p'}">${s.seen?'Seen':'New'}</div></div>`).join('')}
+    </div>`;
+}
+
+// ══════════════════════════════════
+// POST DETAIL
+// ══════════════════════════════════
+function openPost(id) {
+  const p = POSTS.find(x=>x.id===id);
+  if (!p) return;
+  const a = ARTISTS.find(x=>x.name===p.artist);
+  document.getElementById('m-post-body').innerHTML = `
+    <div style="width:100%;aspect-ratio:1;background:var(--s2);display:flex;align-items:center;justify-content:center;font-size:90px">${p.emoji}</div>
+    <div class="minner">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+        <div style="width:32px;height:32px;border-radius:50%;background:conic-gradient(var(--gold),var(--ink));display:flex;align-items:center;justify-content:center;padding:2px;flex-shrink:0"><div style="width:100%;height:100%;border-radius:50%;background:var(--s2);display:flex;align-items:center;justify-content:center;border:2px solid var(--bg)">${a?.ico||'🗡️'}</div></div>
+        <div style="flex:1"><div style="font-size:13px;font-weight:800;color:var(--cream)">${p.artist}</div><div style="font-size:11px;color:var(--muted)">${p.style}</div></div>
+        ${role ? `<button onclick="deletePost(${id})" style="padding:5px 11px;background:var(--s3);border:1px solid var(--border2);border-radius:7px;font-size:11px;font-weight:700;color:var(--muted2);cursor:pointer">Delete</button>` : ''}
+      </div>
+      ${FEATS.likes ? `
+      <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)">
+        <button onclick="toggleLike(${id});this.textContent=POSTS.find(x=>x.id===${id}).liked?'❤️':'🤍'" style="font-size:22px;cursor:pointer;background:none;border:none">${p.liked?'❤️':'🤍'}</button>
+        <button onclick="closeModals();openBookingModal()" style="font-size:22px;cursor:pointer;background:none;border:none">📅</button>
+        <button onclick="gatedAction('save')" style="font-size:22px;cursor:pointer;background:none;border:none;margin-left:auto">🔖</button>
+      </div>
+      <div style="font-size:13px;font-weight:800;color:var(--cream);padding:8px 0 4px">${p.likes} likes</div>` : ''}
+      <div style="font-size:13px;line-height:1.55;margin-bottom:6px"><b style="color:var(--cream)">${p.artist}</b> ${p.cap}</div>
+      <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:10px">${p.tags.map(t=>`<span style="color:var(--sapphire);font-size:12px">#${t}</span>`).join(' ')}</div>
+      ${FEATS.comments ? `
+      <div class="cmt-box" id="cmt-box-${id}">
+        ${p.cmts.map(c=>`<div class="cmt"><div class="cmt-av">${c.ico}</div><div><div class="cmt-u">${c.u}</div><div class="cmt-t">${c.t}</div></div></div>`).join('')}
+        ${!p.cmts.length ? '<div style="text-align:center;color:var(--muted);font-size:12px;padding:8px">No comments yet</div>' : ''}
+      </div>
+      <div class="cmt-inp-row">
+        <input class="cmt-inp" placeholder="Add a comment..." id="cmt-i-${id}" onkeydown="if(event.key==='Enter')addComment(${id})">
+        <button class="cmt-send" onclick="addComment(${id})">Post</button>
+      </div>` : ''}
+    </div>`;
+  openModal('m-post');
+}
+
+function addComment(postId) {
+  if (!loggedIn && !role) { closeModals(); gatedAction('comment'); return; }
+  const inp = document.getElementById('cmt-i-'+postId);
+  if (!inp?.value.trim()) return;
+  const p = POSTS.find(x=>x.id===postId);
+  p.cmts.push({u: currentUser?.name || 'Admin', ico:'👤', t:inp.value});
+  const box = document.getElementById('cmt-box-'+postId);
+  const d = document.createElement('div');
+  d.className = 'cmt';
+  d.innerHTML = `<div class="cmt-av">👤</div><div><div class="cmt-u">${currentUser?.name||'Admin'}</div><div class="cmt-t">${inp.value}</div></div>`;
+  box.appendChild(d); box.scrollTop = box.scrollHeight;
+  inp.value = '';
+  addNotif('ni-cmt','💬','New Comment',`On ${p.artist}'s post: "${p.cap.substring(0,30)}..."`, 'Just now');
+  toast('✓ Comment posted');
+}
+
+function deletePost(id) {
+  const i = POSTS.findIndex(p=>p.id===id);
+  if (i !== -1) POSTS.splice(i,1);
+  buildGrid(); buildFeed();
+  document.getElementById('p-posts').textContent = POSTS.length;
+  closeModals(); toast('🗑️ Post deleted');
+}
+
+// ══════════════════════════════════
+// MESSAGES
+// ══════════════════════════════════
+function renderMsgs() {
+  const convs = [
+    {name:'Emma Thompson',last:'Looking to book a realism sleeve!',time:'14:32',unread:2,online:true,ico:'👩'},
+    {name:'James Rodriguez',last:'Thanks for the info 🙏',time:'12:10',unread:0,online:false,ico:'👨'},
+    {name:'Sophie Laurent',last:'Can I see healed photos?',time:'Yesterday',unread:1,online:true,ico:'👩‍🦱'},
+    {name:'Marcus Lee',last:'Sent reference photos',time:'Yesterday',unread:0,online:false,ico:'🧔'},
+  ];
+  document.getElementById('pg-messages').innerHTML = `
+    <div class="sec-h">Messages 💬</div>
+    <div class="sec-s">Customer conversations</div>
+    <input class="fi" placeholder="🔍  Search conversations..." style="margin-bottom:14px">
+    ${convs.map(c=>`<div class="clist-item" onclick="openChat('${c.name}','${c.ico}')">
+      <div class="clist-av">${c.ico}${c.online?'<div class="c-online"></div>':''}</div>
+      <div style="flex:1;min-width:0"><div style="font-size:14px;font-weight:700">${c.name}</div><div style="font-size:12px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-top:2px">${c.last}</div></div>
+      <div style="text-align:right;flex-shrink:0"><div style="font-size:10px;color:var(--muted)">${c.time}</div>${c.unread?`<div style="background:var(--ink);color:white;font-size:10px;font-weight:800;padding:1px 7px;border-radius:100px;margin-top:3px">${c.unread}</div>`:''}</div>
+    </div>`).join('')}`;
+}
+
+function openChat(name, ico) {
+  document.getElementById('m-post-body').innerHTML = `
+    <div class="minner">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div style="width:38px;height:38px;background:var(--s3);border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:19px">${ico}</div>
+          <div><div style="font-size:15px;font-weight:800">${name}</div><div style="font-size:11px;color:var(--emerald)">Online</div></div>
+        </div>
+        <button onclick="closeModals()" style="font-size:19px;color:var(--muted);cursor:pointer">✕</button>
+      </div>
+      <div style="background:var(--s2);border-radius:12px;padding:14px;min-height:140px;display:flex;flex-direction:column;gap:9px;margin-bottom:12px;max-height:200px;overflow-y:auto" id="achat">
+        <div style="align-self:flex-start;background:var(--s3);padding:9px 13px;border-radius:12px 12px 12px 4px;font-size:13px;max-width:85%">Hi! I'd love to book a consultation.</div>
+        <div style="align-self:flex-end;background:var(--ink);padding:9px 13px;border-radius:12px 12px 4px 12px;font-size:13px;max-width:85%;color:white">Of course! What style are you thinking?</div>
+      </div>
+      <div style="display:flex;gap:8px">
+        <input class="cmt-inp" placeholder="Type a message..." id="achat-inp" onkeydown="if(event.key==='Enter')sendChat()">
+        <button class="cmt-send" onclick="sendChat()">→</button>
+      </div>
+    </div>`;
+  openModal('m-post');
+}
+
+function sendChat() {
+  const inp = document.getElementById('achat-inp');
+  if (!inp?.value.trim()) return;
+  const d = document.createElement('div');
+  d.style.cssText = 'align-self:flex-end;background:var(--ink);padding:9px 13px;border-radius:12px 12px 4px 12px;font-size:13px;max-width:85%;color:white';
+  d.textContent = inp.value;
+  document.getElementById('achat').appendChild(d);
+  inp.value = ''; toast('✓ Sent');
+}
+
+function sendPubMsg() {
+  const inp = document.getElementById('pub-msg-inp');
+  if (!inp?.value.trim()) return;
+  const msgs = document.getElementById('pub-msgs');
+  const d = document.createElement('div');
+  d.style.cssText = 'align-self:flex-end;background:var(--ink);padding:9px 13px;border-radius:12px 12px 4px 12px;font-size:13px;color:white;max-width:85%';
+  d.textContent = inp.value; msgs.appendChild(d);
+  const txt = inp.value; inp.value = '';
+  msgs.scrollTop = msgs.scrollHeight;
+  setTimeout(() => {
+    const rep = document.createElement('div');
+    rep.style.cssText = 'align-self:flex-start;background:var(--s3);padding:9px 13px;border-radius:12px 12px 12px 4px;font-size:13px;max-width:85%';
+    rep.textContent = "Thanks for reaching out! 🌹 We'll get back to you within the hour.";
+    msgs.appendChild(rep); msgs.scrollTop = msgs.scrollHeight;
+  }, 1000);
+  addNotif('ni-msg','✉️','New Message',`"${txt.substring(0,50)}"`, 'Just now');
+  toast('✓ Message sent');
+}
+
+// ══════════════════════════════════
+// FINANCE
+// ══════════════════════════════════
+function renderFinance() {
+  document.getElementById('pg-finance').innerHTML = `
+    <div class="sec-h">Finance 💰</div>
+    <div class="sec-s">Income & expense tracking</div>
+    <div class="sg">
+      <div class="sc sgr"><div style="font-size:18px;margin-bottom:4px">📈</div><div class="sc-v">$14.2K</div><div class="sc-l">Monthly Income</div></div>
+      <div class="sc sr"><div style="font-size:18px;margin-bottom:4px">📉</div><div class="sc-v">$3.9K</div><div class="sc-l">Monthly Expenses</div></div>
+      <div class="sc sg2"><div style="font-size:18px;margin-bottom:4px">💎</div><div class="sc-v">$10.3K</div><div class="sc-l">Net Profit</div></div>
+      <div class="sc sb"><div style="font-size:18px;margin-bottom:4px">📊</div><div class="sc-v">72%</div><div class="sc-l">Margin</div></div>
+    </div>
+    <div class="card"><div class="card-h">Monthly Overview</div>
+      <div class="chart">${['Jan','Feb','Mar','Apr','May','Jun'].map((d,i)=>{const inc=[9.2,11.1,14.2,8.7,12.0,13.5][i];const exp=[3.1,3.8,3.9,2.9,3.6,4.1][i];const m=15;return `<div class="bar-col" style="gap:1px">
+        <div class="bar-body" style="height:${(inc/m)*100}%;background:var(--emerald);opacity:.7"></div>
+        <div class="bar-body" style="height:${(exp/m)*100}%;background:var(--ink);opacity:.5;margin-top:2px"></div>
+        <div class="bar-lbl">${d}</div></div>`;}).join('')}</div>
+      <div style="display:flex;gap:14px;margin-top:10px">
+        <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--muted2)"><div style="width:10px;height:10px;border-radius:2px;background:var(--emerald)"></div>Income</div>
+        <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--muted2)"><div style="width:10px;height:10px;border-radius:2px;background:var(--ink)"></div>Expenses</div>
+      </div>
+    </div>
+    <div class="tabs" id="fin-tabs">
+      <div class="tab on" onclick="switchFinTab('income',this)">💰 Income</div>
+      <div class="tab" onclick="switchFinTab('expense',this)">🧾 Expenses</div>
+      <div class="tab" onclick="switchFinTab('all',this)">All</div>
+    </div>
+    <div class="card" id="fin-list"><div class="card-h">Income</div>${FINANCE.income.map(f=>`<div class="fin-item fi-in"><div class="fin-l"><div class="fin-ico">${f.ico}</div><div><div class="fin-n">${f.name}</div><div class="fin-d">${f.date} · ${f.cat}</div></div></div><div class="fin-a">+${f.amount}</div></div>`).join('')}</div>
+    <button class="btn-ink" onclick="toast('📊 Export coming soon')">📊 Export Report</button>
+    <button class="btn-ghost" onclick="toast('+ Add transaction')">+ Add Transaction</button>
+  `;
+}
+
+function switchFinTab(type, el) {
+  document.querySelectorAll('#fin-tabs .tab').forEach(t=>t.classList.remove('on'));
+  el.classList.add('on');
+  const list = document.getElementById('fin-list');
+  if (type === 'income') {
+    list.innerHTML = `<div class="card-h">Income</div>${FINANCE.income.map(f=>`<div class="fin-item fi-in"><div class="fin-l"><div class="fin-ico">${f.ico}</div><div><div class="fin-n">${f.name}</div><div class="fin-d">${f.date} · ${f.cat}</div></div></div><div class="fin-a">+${f.amount}</div></div>`).join('')}`;
+  } else if (type === 'expense') {
+    list.innerHTML = `<div class="card-h">Expenses</div>${FINANCE.expenses.map(f=>`<div class="fin-item fi-ex"><div class="fin-l"><div class="fin-ico">${f.ico}</div><div><div class="fin-n">${f.name}</div><div class="fin-d">${f.date} · ${f.cat}</div></div></div><div class="fin-a">${f.amount}</div></div>`).join('')}`;
+  } else {
+    const all = [...FINANCE.income.map(f=>({...f,isIn:true})),...FINANCE.expenses.map(f=>({...f,isIn:false}))];
+    list.innerHTML = `<div class="card-h">All Transactions</div>${all.map(f=>`<div class="fin-item fi-${f.isIn?'in':'ex'}"><div class="fin-l"><div class="fin-ico">${f.ico}</div><div><div class="fin-n">${f.name}</div><div class="fin-d">${f.date} · ${f.cat}</div></div></div><div class="fin-a">${f.isIn?'+':''}${f.amount}</div></div>`).join('')}`;
+  }
+}
+
+// ══════════════════════════════════
+// STOCK
+// ══════════════════════════════════
+function renderStock() {
+  document.getElementById('pg-stock').innerHTML = `
+    <div class="sec-h">Inventory 📦</div>
+    <div class="sec-s">Supply management</div>
+    <div class="sg" style="grid-template-columns:1fr 1fr 1fr">
+      <div class="sc sr"><div style="font-size:18px;margin-bottom:4px">🚨</div><div class="sc-v">${STOCK.filter(s=>s.count<=s.max*.3).length}</div><div class="sc-l">Critical</div></div>
+      <div class="sc sg2"><div style="font-size:18px;margin-bottom:4px">⚠️</div><div class="sc-v">${STOCK.filter(s=>s.count>s.max*.3&&s.count<=s.max*.5).length}</div><div class="sc-l">Low</div></div>
+      <div class="sc sgr"><div style="font-size:18px;margin-bottom:4px">✅</div><div class="sc-v">${STOCK.filter(s=>s.count>s.max*.5).length}</div><div class="sc-l">OK</div></div>
+    </div>
+    <div class="card"><div class="card-h">All Items</div>
+      ${STOCK.map(s=>{const p=Math.round(s.count/s.max*100);const c=p<=30?'var(--ink)':p<=50?'var(--gold)':'var(--emerald)';return `<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)">
+        <div style="width:34px;height:34px;background:var(--s2);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0">${s.ico}</div>
+        <div style="flex:1"><div style="font-size:13px;font-weight:700">${s.name}</div><div style="font-size:11px;color:var(--muted)">${s.cat}</div><div class="sbar"><div class="sbar-fill" style="width:${p}%;background:${c}"></div></div></div>
+        <div style="text-align:right"><div style="font-size:15px;font-weight:800;color:${c}">${s.count}</div><div style="font-size:10px;color:var(--muted)">${s.unit}</div></div>
+      </div>`;}).join('')}
+    </div>
+    <button class="btn-ink" onclick="toast('🛒 Order form')">+ Place Order</button>`;
+}
+
+// ══════════════════════════════════
+// ARTISTS
+// ══════════════════════════════════
+function renderArtists() {
+  document.getElementById('pg-artists').innerHTML = `
+    <div class="sec-h">Artists 🪡</div>
+    <div class="sec-s">Team management</div>
+    <button class="btn-ink" style="margin-bottom:14px" onclick="toast('+ Invite artist')">+ Invite Artist</button>
+    ${ARTISTS.map(a=>`<div class="arcard">
+      <div class="arcard-av">${a.ico}</div>
+      <div style="flex:1"><div style="font-size:14px;font-weight:800;color:var(--cream)">${a.name}</div><div style="font-size:11px;color:var(--muted);margin-top:2px">${a.spec}</div>
+        <div style="display:flex;gap:10px;margin-top:5px">
+          <div style="font-size:11px;color:var(--muted2)">⭐ <b style="color:var(--text)">${a.rating}</b></div>
+          <div style="font-size:11px;color:var(--muted2)">🗡️ <b style="color:var(--text)">${a.jobs}</b></div>
+          <div style="font-size:11px;color:var(--muted2)">💰 <b style="color:var(--text)">${a.monthly}</b></div>
+        </div>
+      </div>
+      <div class="ar-dot d-${a.status==='online'?'on':a.status==='busy'?'bs':'off'}"></div>
+    </div>`).join('')}`;
+}
+
+// ══════════════════════════════════
+// NOTIFICATIONS
+// ══════════════════════════════════
+function renderNotifs() {
+  unread = 0; updateDot();
+  NOTIFS.forEach(n=>n.unread=false);
+  document.getElementById('pg-notifications').innerHTML = `
+    <div class="sec-h">Notifications 🔔</div>
+    <div class="sec-s">All activity</div>
+    ${NOTIFS.map(n=>`<div class="nitem">
+      <div class="nitem-ico ${n.cls}">${n.ico}</div>
+      <div><div style="font-size:13px;font-weight:700;color:var(--cream)">${n.title}</div><div style="font-size:12px;color:var(--muted2);margin-top:2px;line-height:1.5">${n.body}</div><div style="font-size:10px;color:var(--muted);margin-top:4px">${n.time}</div></div>
+    </div>`).join('')}`;
+}
+
+// ══════════════════════════════════
+// SETTINGS (with email templates)
+// ══════════════════════════════════
+function renderSettings() {
+  const el = document.getElementById('pg-settings');
+  if (!el) return;
+  el.innerHTML = `
+    <div class="sec-h">Settings ⚙️</div>
+    <div class="sec-s">Platform & email configuration</div>
+
+    <div class="card">
+      <div class="card-h">Studio Info</div>
+      <div class="fgroup"><label class="flbl">Studio Name</label>
+        <input class="fi" value="${S.name}" oninput="S.name=this.value;buildPublic()"></div>
+      <div class="fgroup"><label class="flbl">Logo Emoji</label>
+        <input class="fi" value="${S.logo}" maxlength="4" oninput="S.logo=this.value.trim()||'🗡️';buildPublic()"></div>
+      <div class="fgroup"><label class="flbl">Bio / Description</label>
+        <textarea class="ft" oninput="S.desc=this.value;buildPublic()">${S.desc}</textarea></div>
+      <div class="fgroup"><label class="flbl">Phone</label>
+        <input class="fi" value="${S.phone}" oninput="S.phone=this.value;buildPublic()"></div>
+      <div class="fgroup"><label class="flbl">Address</label>
+        <input class="fi" value="${S.address}" oninput="S.address=this.value;buildPublic()"></div>
+      <div class="fgroup"><label class="flbl">Opening Hours</label>
+        <input class="fi" value="${S.hours}" oninput="S.hours=this.value;buildPublic()"></div>
+      <div class="fgroup"><label class="flbl">Instagram Handle</label>
+        <input class="fi" value="${S.instagram}" oninput="S.instagram=this.value"></div>
+      <div class="fgroup"><label class="flbl">Website</label>
+        <input class="fi" value="${S.website}" oninput="S.website=this.value"></div>
+      <div class="fgroup"><label class="flbl">Google Maps URL</label>
+        <input class="fi" value="${S.mapsUrl}" oninput="S.mapsUrl=this.value"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-h">Directions Steps (shown on public page)</div>
+      <div class="fgroup"><label class="flbl">Step 1</label>
+        <input class="fi" value="${S.dir_step1}" oninput="S.dir_step1=this.value;document.getElementById('dir-step1')?.textContent=this.value"></div>
+      <div class="fgroup"><label class="flbl">Step 2</label>
+        <input class="fi" value="${S.dir_step2}" oninput="S.dir_step2=this.value;document.getElementById('dir-step2')?.textContent=this.value"></div>
+      <div class="fgroup"><label class="flbl">Step 3</label>
+        <input class="fi" value="${S.dir_step3}" oninput="S.dir_step3=this.value;document.getElementById('dir-step3')?.textContent=this.value"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-h">📧 Confirmation Email Templates</div>
+      <div style="background:rgba(62,207,142,.06);border:1px solid rgba(62,207,142,.2);border-radius:10px;padding:12px;margin-bottom:14px;font-size:12px;color:var(--muted2)">
+        ✉️ These templates are automatically included in the confirmation email sent to customers when you approve their booking.
+      </div>
+      <div class="fgroup"><label class="flbl">⚠️ Pre-Appointment Instructions</label>
+        <textarea class="ft" style="min-height:140px" oninput="S.emailBeforeCare=this.value">${S.emailBeforeCare}</textarea></div>
+      <div class="fgroup"><label class="flbl">✅ Post-Appointment Care Instructions</label>
+        <textarea class="ft" style="min-height:140px" oninput="S.emailAfterCare=this.value">${S.emailAfterCare}</textarea></div>
+      <div class="fgroup"><label class="flbl">Footer / Contact Line</label>
+        <input class="fi" value="${S.emailFooter}" oninput="S.emailFooter=this.value"></div>
+      <button class="btn-ghost" style="margin-top:4px" onclick="previewSampleEmail()">👁️ Preview Sample Email</button>
+    </div>
+
+    <div class="card">
+      <div class="card-h">Feature Toggles</div>
+      ${['likes','comments','booking','messaging','stories','highlights','feedView'].map(k=>`
+        <div class="toggle-r">
+          <div class="tl"><div class="t-ico">${{likes:'❤️',comments:'💬',booking:'📅',messaging:'✉️',stories:'⭕',highlights:'🔘',feedView:'☰'}[k]||'⚙️'}</div>
+            <div><div class="t-lbl">${k.charAt(0).toUpperCase()+k.slice(1)}</div></div>
+          </div>
+          <div class="tsw ${FEATS[k]?'on':'off'}" id="tsw-${k}" onclick="toggleFeat('${k}')"></div>
+        </div>`).join('')}
+    </div>
+    <button class="btn-ink" onclick="toast('✓ All settings saved')">Save All Changes</button>
+  `;
+}
+
+function toggleFeat(k) {
+  FEATS[k] = !FEATS[k];
+  const sw = document.getElementById('tsw-'+k);
+  if (sw) sw.className = 'tsw ' + (FEATS[k]?'on':'off');
+  applyFeats(); toast(`${k} ${FEATS[k]?'enabled ✓':'disabled'}`);
+}
+
+function previewSampleEmail() {
+  const sample = {id:0,customer:'Sample Customer',email:'customer@email.com',phone:'+1 555 000 0000',artist:'Mert Demir',type:'Realism',area:'Upper Arm',time:'14:00',dur:'3 hours',date:'Saturday, March 22',status:'confirmed',price:'$250',notes:''};
+  document.getElementById('email-preview-body').innerHTML = buildConfirmationEmail(sample);
+  openModal('m-email-preview');
+}
+
+// ══════════════════════════════════
+// MORE
+// ══════════════════════════════════
+function renderMore() {
+  document.getElementById('pg-more').innerHTML = `
+    <div class="sec-h">Manage ⚙️</div>
+    <div class="sec-s">Studio tools</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      ${[['📦','Inventory','stock'],['💰','Finance','finance'],['🪡','Artists','artists'],['🔔','Notifications','notifications'],['⚙️','Settings','settings'],['👤','Profile','profile'],['📊','Reports',''],['🎁','Campaigns','']].map(([ico,l,id])=>`
+        <div onclick="${id?`navTo('${id}')`:`toast('Coming soon')`}" style="background:var(--s1);border:1px solid var(--border);border-radius:14px;padding:18px 14px;cursor:pointer;transition:.15s" onmouseover="this.style.borderColor='var(--border2)'" onmouseout="this.style.borderColor='var(--border)'">
+          <div style="font-size:24px;margin-bottom:7px">${ico}</div>
+          <div style="font-size:13px;font-weight:800">${l}</div>
+        </div>`).join('')}
+    </div>`;
+}
+
+// ══════════════════════════════════
+// PROFILE
+// ══════════════════════════════════
+function renderProfile() {
+  const el = document.getElementById('pg-profile');
+  if (!el) return;
+  el.innerHTML = `
+    <div class="sec-h">Profile 👤</div>
+    <div class="card" style="text-align:center;padding:24px">
+      <div style="width:68px;height:68px;border-radius:18px;background:var(--s3);display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 10px">${S.logo}</div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:.07em;color:var(--cream)">${S.name}</div>
+      <div style="font-size:11px;color:var(--ink);font-weight:800;text-transform:uppercase;letter-spacing:.1em;margin-top:2px">${role==='admin'?'Studio Owner':'Tattoo Artist'}</div>
+    </div>
+    <button class="btn-ink" onclick="navTo('settings')">⚙️ Settings & Templates</button>
+    <button class="btn-ghost" onclick="showPublic()">🌐 View Public Page</button>
+    <button onclick="showPublic();role=null" style="width:100%;padding:11px;background:transparent;border:1px solid var(--border);border-radius:9px;color:var(--muted2);font-size:13px;font-weight:700;cursor:pointer;margin-top:8px">🚪 Sign Out</button>`;
+}
+
+// ══════════════════════════════════
+// STORY VIEWER
+// ══════════════════════════════════
+let svIdx = 0, svTimer = null;
+function openSV(i) {
+  svIdx = i; document.getElementById('sv').classList.add('open'); document.body.style.overflow='hidden'; showStory(i);
+}
+function showStory(i) {
+  const s = STORIES[i]; if (!s) { closeSV(); return; }
+  document.getElementById('sv-av').textContent = s.ico;
+  document.getElementById('sv-name').textContent = s.artist;
+  document.getElementById('sv-time').textContent = s.time;
+  s.seen = true; buildStories();
+  document.getElementById('sv-media').innerHTML = `<div class="sv-emoji">${s.emoji}</div>`;
+  document.getElementById('sv-bar').innerHTML = STORIES.map((_,j)=>`<div class="sv-seg"><div class="sv-fill" id="sf-${j}" style="width:${j<i?'100%':'0'}"></div></div>`).join('');
+  clearTimeout(svTimer);
+  const fill = document.getElementById('sf-'+i);
+  if (fill) { fill.style.transition=`width 5000ms linear`; setTimeout(()=>fill.style.width='100%',50); }
+  svTimer = setTimeout(()=>{if(svIdx<STORIES.length-1)showStory(++svIdx);else closeSV();},5000);
+}
+function closeSV() { clearTimeout(svTimer); document.getElementById('sv').classList.remove('open'); document.body.style.overflow=''; }
+
+// ══════════════════════════════════
+// UPLOAD
+// ══════════════════════════════════
+function previewUp(input) {
+  if (!input.files?.[0]) return;
+  const url = URL.createObjectURL(input.files[0]);
+  document.getElementById('up-area').innerHTML = `<img src="${url}" style="width:100%;max-height:220px;object-fit:cover;border-radius:10px"><div style="font-size:12px;color:var(--emerald);text-align:center;margin-top:8px">✓ Uploaded</div><input type="file" accept="image/*,video/*" onchange="previewUp(this)" style="position:absolute;inset:0;opacity:0;cursor:pointer">`;
+}
+function previewRef(input) {
+  if (!input.files?.[0]) return;
+  const url = URL.createObjectURL(input.files[0]);
+  document.getElementById('b-ref-area').innerHTML = `<img src="${url}" style="width:100%;max-height:160px;object-fit:cover;border-radius:10px;pointer-events:none"><div style="font-size:11px;color:var(--emerald);text-align:center;margin-top:6px">✓ Reference added</div><input type="file" accept="image/*" onchange="previewRef(this)" style="position:absolute;inset:0;opacity:0;cursor:pointer">`;
+}
+function submitUpload() {
+  const cap = document.getElementById('up-cap')?.value;
+  if (!cap?.trim()) { toast('⚠️ Add a caption'); return; }
+  const emojis = ['🗡️','💉','🦅','🌸','🔱','🦋','💀','🐉','🐺','⚡','🌙','🔮'];
+  POSTS.unshift({id:Date.now(),emoji:emojis[Math.floor(Math.random()*emojis.length)],artist:document.getElementById('up-artist').value,style:document.getElementById('up-style').value,likes:0,liked:false,cmts:[],cap,tags:[document.getElementById('up-style').value.toLowerCase()]});
+  buildGrid(); buildFeed();
+  document.getElementById('p-posts').textContent = POSTS.length;
+  closeModals(); toast('✓ Post published!');
+}
+function previewStory(input) {
+  if (!input.files?.[0]) return;
+  const url = URL.createObjectURL(input.files[0]);
+  const isVid = input.files[0].type.startsWith('video');
+  document.getElementById('story-up-area').innerHTML = isVid
+    ? `<video src="${url}" style="width:100%;max-height:180px;border-radius:10px;object-fit:cover" controls></video><input type="file" accept="image/*,video/*" onchange="previewStory(this)" style="position:absolute;inset:0;opacity:0;cursor:pointer">`
+    : `<img src="${url}" style="width:100%;max-height:180px;object-fit:cover;border-radius:10px"><input type="file" accept="image/*,video/*" onchange="previewStory(this)" style="position:absolute;inset:0;opacity:0;cursor:pointer">`;
+}
+function submitStory() {
+  const artist = ARTISTS.find(x=>x.name===document.getElementById('story-artist').value) || ARTISTS[0];
+  const emojis = ['🗡️','💉','🦅','🌸','🔱','🦋','💀'];
+  STORIES.unshift({id:Date.now(),artist:artist.name,ico:artist.ico,time:'Just now',seen:false,emoji:emojis[Math.floor(Math.random()*emojis.length)],cap:document.getElementById('story-cap').value||'New story'});
+  buildStories(); closeModals(); toast('⭕ Story added!');
+}
+
+// ══════════════════════════════════
+// INFO MODAL
+// ══════════════════════════════════
+function buildInfoModal() {
+  document.getElementById('info-title').textContent = `${S.logo} ${S.name}`;
+  document.getElementById('info-body').innerHTML = [
+    ['📍','Address',S.address],['📞','Phone',S.phone],['⏰','Hours',S.hours],
+    ['📸','Instagram',S.instagram],['🌐','Website',S.website],
+  ].map(([i,l,v])=>`<div style="display:flex;align-items:flex-start;gap:12px;padding:12px 0;border-bottom:1px solid var(--border)"><div style="font-size:17px;width:24px;text-align:center">${i}</div><div><div style="font-size:10px;color:var(--muted);font-weight:800;text-transform:uppercase;letter-spacing:.06em">${l}</div><div style="font-size:13px;color:var(--text);margin-top:2px">${v}</div></div></div>`).join('');
+}
+
+// ══════════════════════════════════
+// SEARCH
+// ══════════════════════════════════
+function doSearch(q) {
+  const res = document.getElementById('search-res');
+  if (!q.trim()) { res.innerHTML=''; return; }
+  const m = POSTS.filter(p=>p.artist.toLowerCase().includes(q.toLowerCase())||p.style.toLowerCase().includes(q.toLowerCase())||p.tags.some(t=>t.includes(q.toLowerCase())));
+  res.innerHTML = m.length
+    ? `<div style="font-size:11px;color:var(--muted);margin-bottom:10px;font-weight:700">${m.length} results</div><div class="ig-grid">${m.map(p=>`<div class="ig-cell" onclick="closeModals();openPost(${p.id})"><div class="ig-thumb">${p.emoji}</div></div>`).join('')}</div>`
+    : `<div style="text-align:center;color:var(--muted);padding:24px;font-size:14px">No results for "${q}"</div>`;
+}
+
+// ══════════════════════════════════
+// HIGHLIGHTS
+// ══════════════════════════════════
+function openHl(name) {
+  const matches = POSTS.filter(p=>p.style===name||p.tags.includes(name.toLowerCase()));
+  document.getElementById('m-post-body').innerHTML = `
+    <div class="minner"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px"><div class="mtitle" style="margin:0">${name}</div><button onclick="closeModals()" style="font-size:19px;color:var(--muted);cursor:pointer">✕</button></div>
+    ${matches.length ? `<div class="ig-grid">${matches.map(p=>`<div class="ig-cell" onclick="closeModals();openPost(${p.id})"><div class="ig-thumb">${p.emoji}</div></div>`).join('')}</div>` : '<div style="text-align:center;color:var(--muted);padding:24px">No posts yet</div>'}
+    </div>`;
+  openModal('m-post');
+}
+
+// ══════════════════════════════════
+// UTILS
+// ══════════════════════════════════
+function openModal(id) {
+  if (id==='m-info') buildInfoModal();
+  document.getElementById(id)?.classList.add('open');
+}
+function closeModals() { document.querySelectorAll('.moverlay').forEach(m=>m.classList.remove('open')); }
+function activateTab(el) { el.closest('.tabs').querySelectorAll('.tab').forEach(t=>t.classList.remove('on')); el.classList.add('on'); }
+
+let _tt;
+function toast(msg) {
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.style.opacity='1';
+  clearTimeout(_tt);_tt=setTimeout(()=>t.style.opacity='0',2400);
+}
+
+// ══════════════════════════════════
+// INIT
+// ══════════════════════════════════
+buildPublic();
+</script>
+</body>
+</html>
